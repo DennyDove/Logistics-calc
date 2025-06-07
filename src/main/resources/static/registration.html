@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html" charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Main page</title>
+
+    <link href="styles/style.css" th:href="@{/styles/style.css}" rel="stylesheet" type="text/css"/>
+    <!-- В шаблонизаторе Thymeleaf джава скрипт подключается особым образом. См. ниже  -->
+    <script src="js/_script.js"></script>
+
+</head>
+<body>
+<h1>Новая логистика</h1>
+<h3></h3>
+<!-- Основной контейнер, включающий остальные DIV-->
+<div id="container">
+
+  <div class="block_holder1"></div>
+
+  <br /><br />
+  <div id="regform_holder">
+    <div class="regform">
+      <form id="form">
+        <h2> Регистрация нового пользователя </h2>
+        <p><input type="text" placeholder="Ваше имя" id="name"></p>
+        <p><input type="text" placeholder="Ваш логин" id="login"></p>
+        <p><input type="number" placeholder="Ваш возраст" id="age"></p>
+        <p><input type="password" placeholder="Пароль" id="password"></p>
+        <p><input type="password" placeholder="Подтвердите пароль" id="confirmPassword"></p>
+      </form>
+      <div class="hide-error" id="errorMessage">Пароли не совпадают</div>
+      <p><button id="regButton">Зарегистрироваться</button></p>
+    </div>
+
+  </div>
+
+  <!--
+  <div id="block2">
+    <textarea id="responseTextArea" placeholder="Response text 1 - For development issues"></textarea>
+  </div>
+  -->
+
+</div>
+
+</body>
+</html>

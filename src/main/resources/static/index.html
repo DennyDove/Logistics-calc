@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="content-type" content="text/html" charset="UTF-8">
+    <title>Main page</title>
+    <link href="styles/style.css" th:href="@{/styles/style.css}" rel="stylesheet" type="text/css"/>
+
+    <!-- Подключение карт -->
+    <script src="https://maps.api.2gis.ru/2.0/loader.js?pkg=full"></script>
+    <script type="text/javascript">
+      var map;
+      DG.then(function () {
+          map = DG.map('map', {
+              center: [55.98, 37.89],
+              zoom: 13
+          });
+      });
+    </script>
+
+    <!-- В шаблонизаторе Thymeleaf джава скрипт подключается особым образом. См. ниже -->
+    <script th:src="@{/js/script.js}"></script>
+
+</head>
+<body>
+<!-- <h1>Клуб нумизматов</h1> -->
+<h3></h3>
+<!-- Основной контейнер, включающий остальные DIV-->
+  <div id="container">
+
+      <div class="header">
+        <div class="block_logo"> <a href="/"> <img src="images/logo.jpg" width="477" height="153" border="0"> </a> </div>
+        <div class="block_holder1">
+          <div class="profile"> <a href="/login"> <img src="images/profile.png" width="33" height="33" border="0"> <div class="auth_user"> </div> </a> </div>
+          <div class="cart"> <a href="/cart"> <img th:if="${coinsInCart == 0}" src="images/shopping_cart.png" width="53" height="53" border="0">
+                                              <img th:if="${coinsInCart > 0}" src="images/shopping_cart1.png" width="53" height="53" border="0"> </a> </div>
+        </div>
+      </div>
+      <div class="line1"></div>
+      <div id="content_container">
+
+        <div id="map" style="display: inline-block; vertical-align: top; margin-left: 77px; top: 30px; width: 600px;	height: 400px;"> </div>
+
+        <div class="logictic_calc">
+          <h1>Рассчитать стоимость доставки</h1>
+          <br>
+          <form th:action="@{/order}" method="post" th:object="${task}">
+          <!--<h2>Пункт отправления</h2>-->
+              <label for="cList">Пункт отправления:</label>
+              <select id="cList">
+              <!--<select id="cList" th:field="*{startPoint}"
+                <option th:each="c : ${cityList}" th:value="${c}" th:text="${c.name}"></option> -->
+              </select>
+              <br>
+              <br>
+          <!--<h2>Пункт назначения</h2>-->
+              <label for="cList">Пункт назначения:</label>
+              <select id="cList">
+              <!--<select id="status_change" th:field="*{status}" >
+                <option th:each="s : ${statusList}" th:value="${s}" th:text="${s.title}"></option> -->
+              </select>
+              <br>
+              <br>
+              <input type="text" th:field="*{cargoName}" placeholder="Тип груза"> Тип груза</input>
+              <br>
+              <br>
+              <input type="text" th:field="*{weight}" placeholder="Вес груза"> Вес груза </input>
+              <br>
+              <br>
+              <button type="submit">Рассчитать</button>
+            </form>
+        </div>
+
+      </div>
+
+  </div>
+
+</body>
+</html>

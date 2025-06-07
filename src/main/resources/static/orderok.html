@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="content-type" content="text/html" charset="UTF-8">
+    <title>Main page</title>
+    <link href="styles/style.css" th:href="@{/styles/style.css}" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<!-- <h1>Клуб нумизматов</h1> -->
+<h3></h3>
+<!-- Основной контейнер, включающий остальные DIV-->
+  <div id="container">
+
+      <div class="header">
+        <div class="block_logo"> <a href="/"> <img src="images/logo.jpg" width="477" height="153" border="0"> </a> </div>
+        <div class="block_holder1">
+          <div class="profile"> <img src="images/profile1.png" width="33" height="33" border="0"> <div class="auth_user"> [[${userInit}]] </div> </div>
+          <div class="cart"> <a href="/cart"> <img th:if="${coinsInCart == 0}" src="images/shopping_cart.png" width="53" height="53" border="0">
+                                              <img th:if="${coinsInCart > 0}" src="images/shopping_cart1.png" width="53" height="53" border="0"> </a> </div>
+        </div>
+      </div>
+      <div class="line1"></div>
+      <div id="content_container">
+
+        <div class="logictic_calc">
+            <div class="cart_text"> Ваш заказ номер [[ ${orderId} ]] принят в работу! </div>
+            <div class="cart_text"> <a href="/"> Вернуться к покупкам </a> </div>
+        </div>
+
+      </div>
+
+  </div>
+
+</body>
+</html>

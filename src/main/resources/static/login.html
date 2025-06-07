@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="content-type" content="text/html" charset="UTF-8">
+    <title>Main page</title>
+    <link href="styles/style.css" th:href="@{/styles/style.css}" rel="stylesheet" type="text/css"/>
+    <!-- В шаблонизаторе Thymeleaf джава скрипт подключается особым образом. См. ниже -->
+    <script th:src="@{/js/script.js}"></script>
+
+</head>
+<body>
+<!-- <h1>Клуб нумизматов</h1> -->
+<h3></h3>
+<!-- Основной контейнер, включающий остальные DIV-->
+  <div id="container">
+
+      <div class="header">
+        <div class="block_logo"> <a href="/"> <img src="images/logo.jpg" width="477" height="153" border="0"> </a> </div>
+        <div class="block_holder1"></div>
+      </div>
+      <div class="line1"></div>
+      <div id="content_container">
+
+        <br /><br />
+        <div id="regform_holder">
+          <div class="regform">
+            <div th:if="${param.error}">
+        			Неверный пароль или имя пользователя.</div>
+        		<div th:if="${param.logout}">
+        			Вы вышли из профиля.</div>
+            <form th:action="@{/login}" method="post">
+              <h1> Вход в систему </h1>
+              <p><input type="text" name="username" placeholder="Ваш логин" id="login"></p>
+              <p ><input type="password" name="password" placeholder="Ваш Пароль" id="password"></p>
+              <a href="/registration"> Зарегистрироваться </a>
+              <p><input type="submit" value=" Войти " /></p>
+            </form>
+            <!-- <p><button id="loginButton"> Войти </button></p> -->
+          </div>
+        </div>
+
+      </div>
+
+  </div>
+
+</body>
+</html>

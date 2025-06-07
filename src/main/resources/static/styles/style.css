@@ -1,0 +1,360 @@
+/* Редакция от 09.06.2024 */
+/* Редакция от 24.02.2010 */
+
+body, html {
+	margin: 0px;
+	padding: 0px;
+	border: none;
+	outline-style: none;
+	text-align: center;
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+.table {
+    display: flex;
+}
+
+.column {
+    margin-bottom: 1em;
+    width: 100%;
+}
+
+.row {
+    border: 1px black solid;
+    height: 3em;
+    margin: auto;
+    width: 100%;
+}
+
+.active {
+	color: #9999FF;
+}
+
+/* Для отображения сообщения об ошибке*/
+.show-error{
+    color: red;
+    display: block;
+}
+
+/* Для скрытия сообщения об ошибке*/
+.hide-error{
+    display: none;
+}
+
+p {
+	font-size: 12px;
+	font-weight: normal;
+}
+
+p.text {
+/*	text-indent: 2em; */
+}
+
+span.underlined_text {
+	text-decoration: underline;
+}
+
+span.red_text {
+	color: #FF0066;
+}
+
+a { /* установка малинового цвета для всех гиперссылок */
+	font-size: 14px;
+	font-weight: normal;
+	color: #FF0066;
+}
+
+li {
+	font-size: 12px;
+	font-weight: normal;
+}
+
+h1 {
+	font-size: 17px;
+	color: #003457;
+}
+h2 {
+	font-size: 15px;
+		color: #483D8B;;
+}
+h3 {
+	font-size: 12px;
+	color: #696969;
+}
+
+#container{
+margin: 0 auto; /*обнуление полей и отступов, т.к. различные браузеры их по разному воспринимают. */
+text-align: left; /*Отменяем tex-align:center заданное в body. Делаем чтобы весь текст в макете выравнивался по левому краю */
+
+width: 100%;
+min-height: 100%;
+height: auto  !important;
+height: 100%;
+position: relative;
+
+min-width: 1037px; /*задаем минимальную ширину макета в современных браузерах */
+width: expression(  /*задаем минимальную ширину макета в старых версия браузера.*/
+(document.compatMode && document.compatMode == 'CSS1Compat')
+?
+(document.documentElement.clientWidth < 1037
+? "1037px" : "auto") : (document.body.clientWidth < 1037px
+? "1037px" : "auto"));}
+
+
+/* Стили виртуальной витрины */
+#content_container {
+	margin-top: 10px;
+  margin-right: 203px;
+	margin-bottom: 77px;
+	width: 100%;
+	position:  relative;
+	/* background-color: #99CCCC; */
+	/* background-image:  url(images/coins1.jpg);
+	background-repeat: repeat-x;
+
+	font-size: 14px;
+	font-weight: bolder; */
+}
+
+/*
+div.block_logo {
+	display: inline-block;
+	vertical-align: top;
+	width: 100%;
+	text-align: right;
+	line-height: 0px;
+}*/
+
+div.header {
+	position: relative;
+	width: 100%;
+	height: 123px;
+	/*background-color: #99CCCF;*/
+}
+
+div.block_logo {
+	display: inline-block;
+	/*background-color: #99CCCC;*/
+}
+
+div.block_holder1 {
+	position: absolute;
+	display: inline-block;
+	width: auto;
+	height: 53px;
+
+	right: 10px;
+	bottom: 13px;
+	line-height: 0px;
+	/*background-color: #99CCCC;*/
+	/*background-image: url(images/chain1_bkd.png);
+	background-repeat: repeat-x;*/
+}
+
+div.cart {
+	display: inline-block;
+	position: relative;
+	/*top: 13px;*/
+	bottom: 7px;
+}
+
+div.profile {
+	display: inline-block;
+	position: relative;
+	bottom: 10px;
+}
+
+/* блок для корректного отображения кружочка с буквой имени пользователя*/
+div.profile_user {
+	display: inline-block;
+	position: relative;
+	bottom: 3px;
+	z-index: 2;
+}
+
+div.user_menu {
+	display: inline-block;
+	position: relative;
+	left: 33px;
+}
+
+div.auth_user {
+	position: relative;
+	margin: auto;
+	text-align: center;
+	font-size: 16px;
+	font-style: normal;
+	font-weight: bolder;
+	color: #8A2BE2;
+	/*left: 0px;*/
+	bottom: 16px;
+	z-index: 1;
+}
+
+div.line1 {
+	position: relative;
+	height: 4px;
+	width: 100%;
+	background-color: #483D8B;
+}
+
+div.logictic_calc {
+	display: inline-block;
+	vertical-align: top;
+
+	margin-left:30px;
+	margin-top: 30px;
+	padding: 23px;
+	height: 350px;
+	width: 377px;
+
+	border: medium solid;
+	border-color: #483D8B;
+	border-radius: 17px;
+
+/*
+	text-align: left;
+	font-size: 23px;
+	font-style: normal;
+	font-weight: bold;
+	background-color: #99CCCC;
+	*/
+
+}
+
+div.item_card {
+	display: inline-block;
+	vertical-align: top;
+	margin-left:30px;
+  margin-top: 30px;
+  height: 453px;
+	width: 277px;
+	/* position: relative; */
+	top: 23px;
+	left: 23px;
+	background-color: #FFF6DD;
+	background-image:  url(images/item_card1.jpg);
+	background-repeat: repeat-x;
+	font-size: 17px;
+	font-weight: bolder;
+	text-align: center;
+}
+
+div.item_image {
+	margin-left: 58px;
+	margin-right: 58px;
+	width: 177px;
+	height: 172px;
+	position: relative;
+}
+
+div.item_name {
+	margin: 33px;
+	font-size: 21px;
+	text-align: center;
+	color: #000000;
+}
+
+div.item_price {
+	margin: 17px;
+	font-size: 23px;
+	text-align: center;
+	color: #FF0066;
+}
+
+div.itemAdded {
+	display: grid;
+	vertical-align: top;
+	margin-left:100px;
+  margin-top: 30px;
+	margin-bottom: 30px;
+	padding-bottom: 17px;
+  height: 77px;
+	width: 100%;
+	min-width: 1300px;
+	/* position: relative; */
+	/*top: 23px;
+	left: 23px;*/
+	background-color: #FFF6DD;
+	font-size: 17px;
+	font-weight: bolder;
+	text-align: center;
+}
+
+div.cart_item {
+	display: inline-grid;
+	position: relative;
+	top: 17px;
+	margin: 0px;
+	height: 40px;
+	width: 213px;
+	font-size: 15px;
+	text-align: center;
+	color: #FF4500;
+}
+
+div.cart_text {
+	display: inline-grid;
+	position: relative;
+	margin: 10px;
+	height: 40px;
+	width: 223px;
+	padding-bottom: 0px;
+	font-size: 15px;
+	text-align: center;
+	color: #FF4500;
+  /*background-color: #FF1493; */
+}
+
+div.cart_drop_button {
+	display: inline-block;
+	position: relative;
+	width: 40px;
+	height: 40px;
+	right: 10px;
+	top: 0px;
+	text-align: right;
+	bottom: 0px;
+}
+
+.cart_drop_button:hover {
+	cursor: pointer;
+}
+
+#qty_input1 {
+	position: relative;
+	width: 33px;
+}
+
+#qty_input2 {
+	position: relative;
+	width: 33px;
+	bottom: 23px;
+}
+
+#regform_holder {
+	margin: auto;
+  padding: 23px;*/
+  height: 233px;
+	width: 433px;
+	border-radius: 17px;
+	position:  relative;
+	background-color: #FFF6DD;
+
+	font-size: 14px;
+	font-weight: bolder;
+}
+
+div.regform {
+	margin: auto;
+	width: 180px;
+	height: auto;
+}
+
+/*
+div.map {
+	margin: auto;
+	left: 500px;
+	width: 700px;
+	height: 400px;
+}*/
