@@ -5,11 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Main page</title>
-
-    <link href="styles/style.css" th:href="@{/styles/style.css}" rel="stylesheet" type="text/css"/>
-    <!-- В шаблонизаторе Thymeleaf джава скрипт подключается особым образом. См. ниже  -->
-    <script src="js/_script.js"></script>
-
+    <link href="styles/style.css" th:href="@{styles/style.css}" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 <h1>Новая логистика</h1>
@@ -27,6 +23,7 @@
         <p><input type="text" placeholder="Ваше имя" id="name"></p>
         <p><input type="text" placeholder="Ваш логин" id="login"></p>
         <p><input type="number" placeholder="Ваш возраст" id="age"></p>
+        <p><input type="email" placeholder="Ваш e-mail" id="email"></p>
         <p><input type="password" placeholder="Пароль" id="password"></p>
         <p><input type="password" placeholder="Подтвердите пароль" id="confirmPassword"></p>
       </form>
@@ -43,6 +40,8 @@
   -->
 
 </div>
-
+<!-- Блок JavaScript лучше всего подключать здесь - в конце <body>, т.к. иначе не считываются элементы DOM-->
+<!-- В шаблонизаторе Thymeleaf джава скрипт подключается особым образом. См. ниже  -->
+<script src="js/script.js"></script>
 </body>
 </html>

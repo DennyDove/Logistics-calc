@@ -1,5 +1,9 @@
 package com.denidove.Logistics.enums;
 
+import lombok.Getter;
+
+@Getter
+
 public enum City {
     Moscow("Москва", 0),
     Piter("Санкт-Петербург", 5.5),

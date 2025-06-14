@@ -1,6 +1,7 @@
 package com.denidove.Logistics.services;
 
-import com.denidove.Logistics.entities.User;
+import com.denidove.Logistics.dto.TaskDto;
+import com.denidove.Logistics.entities.SecurityUser;
 import com.denidove.Logistics.repositories.UserRepository;
 
 import lombok.Getter;
@@ -8,12 +9,10 @@ import lombok.Setter;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.annotation.SessionScope;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Getter
 @Setter
@@ -25,7 +24,7 @@ public class UserSessionService {
 
     private final UserRepository userRepository;
 
-    //private HashMap<Long, CartItemDto> cartItemDtoList = new HashMap<>();
+    private List<TaskDto> taskDto = new ArrayList<>();
 
     public UserSessionService(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -41,8 +40,8 @@ public class UserSessionService {
     }
 
     // Получаем авторизованного пользователя из контекста безопасности
-    public User getUser() {
-        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public SecurityUser getSecurityUser() {
+        return (SecurityUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
 }

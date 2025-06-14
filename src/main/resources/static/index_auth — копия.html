@@ -3,7 +3,7 @@
 <head>
     <meta http-equiv="content-type" content="text/html" charset="UTF-8">
     <title>Main page</title>
-    <link href="styles/style.css" th:href="@{styles/style.css}" rel="stylesheet" type="text/css"/>
+    <link href="styles/style.css" th:href="@{/styles/style.css}" rel="stylesheet" type="text/css"/>
 
     <!-- Подключение карт -->
     <script src="https://maps.api.2gis.ru/2.0/loader.js?pkg=full"></script>
@@ -16,7 +16,6 @@
           });
       });
     </script>
-
 </head>
 <body>
 <!-- <h1>Клуб нумизматов</h1> -->
@@ -27,7 +26,7 @@
       <div class="header">
         <div class="block_logo"> <a href="/"> <img src="images/logo.jpg" width="477" height="153" border="0"> </a> </div>
         <div class="block_holder1">
-          <div class="profile"> <a href="/login"> <img src="images/profile.png" width="33" height="33" border="0"> <div class="auth_user"> </div> </a> </div>
+          <div class="profile"> <a href="/user-lk"> <img src="images/profile1.png" width="33" height="33" border="0"> <div class="auth_user"> [[${userInit}]] </div> </a> </div>
           <div class="cart"> <a href="/"> <img th:if="${coinsInCart == 0}" src="images/shopping_cart.png" width="53" height="53" border="0">
                                               <img th:if="${coinsInCart > 0}" src="images/shopping_cart1.png" width="53" height="53" border="0"> </a> </div>
         </div>
@@ -35,12 +34,12 @@
       <div class="line1"></div>
       <div id="content_container">
 
-        <div id="map" style="display: inline-block; vertical-align: top; margin-left: 30px; margin-top: 30px; width: 600px;	height: 400px;"> </div>
+        <div id="map" style="display: inline-block; vertical-align: top; margin-left: 77px; top: 30px; width: 600px;	height: 400px;"> </div>
 
-        <div class="logictic_calc">
+        <div class="logictic_calc" th:object="${task}">
           <h1>Рассчитать стоимость доставки</h1>
           <br>
-          <form th:action="@{/order-dto}" method="post" th:object="${task}">
+          <form th:action="@{/order}" method="post" th:object="${task}">
           <!--<h2>Пункт отправления</h2>-->
           <label for="cityList">Пункт отправления:</label>
           <select id="cityList" th:field="*{startPoint}">
@@ -55,10 +54,10 @@
           </select>
               <br>
               <br>
-              <input type="text" th:field="*{cargoName}" placeholder="Тип груза"> Тип груза</input>
+              <input type="text" th:field="*{cargoName}" placeholder="Тип груза" th:value="${task.cargoName}"> [[${task.cargoName}]] </input>
               <br>
               <br>
-              <input type="text" th:field="*{weight}" placeholder="Вес груза"> Вес груза, кг.</input>
+              <input type="text" th:field="*{weight}" placeholder="Вес груза" th:value="${task.weight}"> [[${task.weight}]] </input>
               <br>
               <br>
               <button type="submit">Рассчитать</button>

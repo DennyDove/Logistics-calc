@@ -3,25 +3,21 @@ package com.denidove.Logistics.controllers;
 import com.denidove.Logistics.dto.ResponseDto;
 import com.denidove.Logistics.dto.TaskDto;
 import com.denidove.Logistics.entities.Task;
-import com.denidove.Logistics.entities.User;
 import com.denidove.Logistics.services.TaskService;
-import com.denidove.Logistics.services.UserService;
 import com.denidove.Logistics.services.UserSessionService;
-import org.springframework.http.HttpStatus;
+
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.net.URI;
-
-@org.springframework.web.bind.annotation.RestController
-public class RestController {
+@RestController
+public class OrderController {
 
     private final TaskService taskService;
     private final UserSessionService userSessionService;
 
-    public RestController(TaskService taskService, UserSessionService userSessionService) {
+    public OrderController(TaskService taskService, UserSessionService userSessionService) {
         this.taskService = taskService;
         this.userSessionService = userSessionService;
     }
@@ -37,7 +33,7 @@ public class RestController {
 
         boolean authStatus = userSessionService.getAuthStatus();
 
-        task.setUser(userSessionService.getUser());
+        task.setUser(userSessionService.getSecurityUser().getUser());
         Long orderId = taskService.save(task);
         userSessionService.getTaskDto().clear();
         //model.addAttribute("orderId", orderId);

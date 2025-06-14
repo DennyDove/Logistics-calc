@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="content-type" content="text/html" charset="UTF-8">
+    <title>Main page</title>
+    <link href="styles/style.css" th:href="@{styles/style.css}" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<!-- <h1></h1> -->
+<!-- Основной контейнер, включающий остальные DIV-->
+<div id="container">
+
+  <div class="header">
+    <div class="block_logo"> <a href="/"> <img src="images/logo.jpg" width="477" height="153" border="0"> </a> </div>
+    <div class="block_holder1">
+          <div class="profile"> <img src="images/profile1.png" width="33" height="33" border="0"> <div class="auth_user"> [[${userInit}]] </div> </div>
+      <div class="cart"> <a href="/cart"> <img th:if="${coinsInCart == 0}" src="images/shopping_cart.png" width="53" height="53" border="0">
+                                          <img th:if="${coinsInCart > 0}" src="images/shopping_cart1.png" width="53" height="53" border="0"> </a> </div>
+    </div>
+  </div>
+  <div class="line1"></div>
+
+    <div id="content_container">
+        <div class="user_menu"> <h2>Активные заказы пользователей </h2> </div>
+
+          <div class="itemAdded" th:each="task: ${taskList}">
+            <div class="table">
+               <div class="column">
+                   <!-- Найдено оптимальное решение обработки форм через th:object="${order}" в теге формы см. выше
+                   и в контроллере @ModelAttribute("order" Order order)  -->
+
+                   <!-- Найдено решение, как передавать множественные параметры через Thymeleaf. См. ниже: -->
+                   <div class="task_text"> <a th:href="@{'/task-details-adm'(user=${task.user.id}, task=${task.id})}"> Заказ номер [[ ${task.id} ]] </a> </div>
+                   <div class="task_text"> [[ ${task.user.name} ]] </div>
+                   <div class="task_text"> [[ ${task.timeDate} ]] </div>
+                   <div class="task_text">  Статус: [[ ${task.status.title} ]] </div>
+               </div>
+            </div>
+           </div>
+
+      </div>
+</div>
+
+</body>
+</html>

@@ -1,35 +1,40 @@
-package com.denidove.trading.dto;
+package com.denidove.Logistics.dto;
 
-import com.denidove.trading.entities.Product;
-import com.denidove.trading.entities.User;
-import com.denidove.trading.enums.ProductStatus;
+import com.denidove.Logistics.enums.City;
+import com.denidove.Logistics.enums.TaskStatus;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.stereotype.Component;
-import org.springframework.web.context.annotation.SessionScope;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Setter
 @NoArgsConstructor
-public class CartItemDto {
+public class TaskDto {
 
-    private Long id;
 
-    private User user;
 
-    private Product product;
+    private String cargoName;
 
-    private Integer quantity;
+    private City startPoint;
 
-    private ProductStatus status;
+    private City destination;
 
-    private static Long idIncrement= 0L; // данное статическое поле сохраняет свое значение внезависимости от сессии
+    private Double distance;
 
-    public CartItemDto(Product product, Integer quantity) {
-        this.id = idIncrement++;
-        this.product = product;
-        this.quantity = quantity;
+    private Double weight;
+
+    private TaskStatus status;
+
+    private static Long idIncrement = 0L; // данное статическое поле сохраняет свое значение внезависимости от сессии
+
+    public TaskDto(String cargoName, City startPoint, City destination,
+                   Double distance, Double weight, TaskStatus status) {
+        this.cargoName = cargoName;
+        this.startPoint = startPoint;
+        this.destination = destination;
+        this.distance = distance;
+        this.weight = weight;
+        this.status = status;
     }
 }
 

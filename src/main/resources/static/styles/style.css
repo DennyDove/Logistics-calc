@@ -30,6 +30,17 @@ body, html {
 	color: #9999FF;
 }
 
+/* Для отображения сообщения */
+.show-message{
+    color: #FF0066;
+    display: block;
+}
+
+/* Для скрытия сообщения */
+.hide-message{
+    display: none;
+}
+
 /* Для отображения сообщения об ошибке*/
 .show-error{
     color: red;
@@ -288,6 +299,18 @@ div.cart_item {
 	margin: 0px;
 	height: 40px;
 	width: 213px;
+	font-size: 15px;
+	text-align: center;
+	color: #FF4500;
+}
+
+div.task_text {
+	display: inline-grid;
+	position: relative;
+	top: 17px;
+	margin: 0px;
+	height: 40px;
+	width: 133px;
 	font-size: 15px;
 	text-align: center;
 	color: #FF4500;

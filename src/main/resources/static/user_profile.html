@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="content-type" content="text/html" charset="UTF-8">
+    <title>Main page</title>
+    <link href="styles/style.css" th:href="@{styles/style.css}" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<!-- <h1></h1> -->
+<!-- Основной контейнер, включающий остальные DIV-->
+<div id="container">
+
+  <div class="header">
+    <div class="block_logo"> <a href="/"> <img src="images/logo.jpg" width="477" height="153" border="0"> </a> </div>
+    <div class="block_holder1">
+          <div class="profile"> <img src="images/profile1.png" width="33" height="33" border="0"> <div class="auth_user"> [[${userInit}]] </div> </div>
+      <div class="cart"> <a href="/cart"> <img th:if="${coinsInCart == 0}" src="images/shopping_cart.png" width="53" height="53" border="0">
+                                          <img th:if="${coinsInCart > 0}" src="images/shopping_cart1.png" width="53" height="53" border="0"> </a> </div>
+    </div>
+  </div>
+  <div class="line1"></div>
+
+    <div id="content_container">
+        <div class="user_menu"> <h2> Профиль пользователя [[ ${name} ]]</h2> </div>
+
+        <br /><br />
+        <div id="regform_holder">
+          <div class="regform">
+            <form>
+              <h2> Личные данные </h2>
+              <p><input type="text" placeholder="Ваше имя" id="name" th:value="${name}"></p>
+              <p><input type="text" placeholder="Ваш логин" id="login" th:value="${login}"></p>
+              <p><input type="text" placeholder="Ваш e-mail" id="email" th:value="${email}"></p>
+              <p><input type="number" placeholder="Ваш возраст" id="age" th:value="${age}"></p>
+              <!-- <p><input type="password" placeholder="Пароль" id="password"></p> -->
+            </form>
+            <p><button id="regButton">Сохранить</button></p>
+          </div>
+
+        </div>
+
+      </div>
+
+  </div>
+</div>
+<!-- Блок JavaScript лучше всего подключать здесь - в конце <body>, т.к. иначе не считываются элементы DOM-->
+<!-- В шаблонизаторе Thymeleaf джава скрипт подключается особым образом. См. ниже  -->
+<script th:src="@{js/script.js}"></script>
+
+</body>
+</html>

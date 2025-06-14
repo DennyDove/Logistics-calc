@@ -1,5 +1,6 @@
 package com.denidove.Logistics.services;
 
+import com.denidove.Logistics.entities.SecurityUser;
 import com.denidove.Logistics.entities.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,7 +24,6 @@ public class CustomUserDetailsService implements UserDetailsService {
         if (userFromDb.isEmpty()) {
             throw new UsernameNotFoundException("User not found");
         }
-        return userFromDb.get();
-
+        return new SecurityUser(userFromDb.get());
     }
 }

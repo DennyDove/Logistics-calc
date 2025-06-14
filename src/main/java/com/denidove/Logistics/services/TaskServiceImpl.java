@@ -1,26 +1,71 @@
 package com.denidove.Logistics.services;
 
+import com.denidove.Logistics.dto.TaskDto;
 import com.denidove.Logistics.entities.Task;
+import com.denidove.Logistics.enums.TaskStatus;
 import com.denidove.Logistics.repositories.TaskRepository;
 import org.springframework.stereotype.Service;
+
+import java.sql.Timestamp;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository taskRepository;
+    private final UserSessionService userSessionService;
 
-    public TaskServiceImpl(TaskRepository taskRepository) {
+    public TaskServiceImpl(TaskRepository taskRepository, UserSessionService userSessionService) {
         this.taskRepository = taskRepository;
+        this.userSessionService = userSessionService;
     }
 
-    //public Optional<Task> findById(Long id);
-    //public Optional<Task> findByLogin(String login);
+    public Optional<Task> findById(Long id) {
+        return taskRepository.findById(id);
+    }
+
+    public Optional<Task> findByUserId(Long userId) {
+        return taskRepository.findByUserId(userId);
+    }
+
+    public Optional<Task> findByUserIdAndTaskId(Long userId, Long taskId) {
+        return taskRepository.findByUserIdAndId(userId, taskId);
+    }
+
+    public List<Task> findAll() {
+        return taskRepository.findAll();
+    }
+
+    public List<Task> findAllByStatus(TaskStatus taskStatus) {
+        return taskRepository.findAllByStatus(taskStatus);
+    }
+
+    public List<Task> findAllByUserId(Long userId) {
+        return taskRepository.findAllByUserId(userId);
+    }
 
     public Long save(Task task) {
-
+        task.setTimeDate(new Timestamp(System.currentTimeMillis()));
+        task.setStatus(TaskStatus.InWork);
         return taskRepository.save(task).getId();
     }
 
-    //public void saveToDto();
+    //toDo
+    public void saveToDto(TaskDto taskDto) {
+        userSessionService.getTaskDto().add(taskDto);
+        /*
+        userSessionService.getTaskDto().setCargoName(task.getCargoName());
+        userSessionService.getTaskDto().setStartPoint(task.getStartPoint());
+        userSessionService.getTaskDto().setDestination(task.getDestination());
+        userSessionService.getTaskDto().setDistance(task.getDistance());
+        userSessionService.getTaskDto().setWeight(task.getWeight());
+        */
+    }
+
+
+    public void updateTaskAdmin(Task task) {
+        taskRepository.save(task);
+    }
 
 }

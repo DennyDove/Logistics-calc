@@ -8,6 +8,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -24,7 +25,8 @@ public class SecurityConfiguration {
     @Bean
     public PasswordEncoder passwordEncoder() {
         //toDo сделать нормальную шифровку паролей
-        return NoOpPasswordEncoder.getInstance();
+        //return NoOpPasswordEncoder.getInstance();
+        return new BCryptPasswordEncoder();
     }
 
     @Bean
@@ -49,9 +51,9 @@ public class SecurityConfiguration {
                 requests -> {
                     //              указываем паттерн "/**" т.к у нас в уже установлено "spring.thymeleaf.prefix=classpath:/static/"
                     requests.requestMatchers("/js/**", "/styles/**", "/images/**", "/",
-                                    "/registration", "/adduser").permitAll();
-                    //requests.requestMatchers("/login").permitAll();
-                    requests.requestMatchers(HttpMethod.GET, "/admin_lk").hasAuthority("Admin");
+                                    "/registration", "/adduser", "/verify").permitAll();
+                    requests.requestMatchers(HttpMethod.POST,"/order-dto").permitAll();
+                    requests.requestMatchers(HttpMethod.GET, "/admin-lk", "/active-orders").hasAuthority("Admin");
                     requests.anyRequest().authenticated();
                 }
         );

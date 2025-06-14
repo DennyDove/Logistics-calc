@@ -1,5 +1,6 @@
 package com.denidove.Logistics.entities;
 
+import com.denidove.Logistics.enums.City;
 import com.denidove.Logistics.enums.TaskStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
