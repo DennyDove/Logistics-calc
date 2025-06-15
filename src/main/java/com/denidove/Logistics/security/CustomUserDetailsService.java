@@ -1,18 +1,17 @@
-package com.denidove.Logistics.services;
+package com.denidove.Logistics.security;
 
 import com.denidove.Logistics.entities.SecurityUser;
 import com.denidove.Logistics.entities.User;
+import com.denidove.Logistics.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.Optional;
 
-@Service
+//@Component
 public class CustomUserDetailsService implements UserDetailsService {
 
     @Autowired

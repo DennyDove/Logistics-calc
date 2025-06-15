@@ -74,21 +74,9 @@ public class UserServiceImpl implements UserService {
         return userRepository.findUserByLogin(login);
     }
 
-    /*
-    public boolean verify(String verificationCode) {
-        User user = userRepository.findByVerificationCode(verificationCode).get();
-
-        if (user == null || user.isEnabled()) {
-            return false;
-        } else {
-            user.setVerificationCode(null);
-            user.setEnabled(true);
-            repo.save(user);
-
-            return true;
-        }
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findUserByEmail(email);
     }
-     */
 
 }
 

@@ -12,6 +12,7 @@ public interface UserService {
     public boolean verify(String code);
     public Optional<User> findById(Long id);
     public Optional<User> findByLogin(String login);
+    public Optional<User> findByEmail(String email);
 
     //public boolean verify(String verificationCode);
 

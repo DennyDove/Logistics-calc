@@ -1,26 +1,27 @@
 package com.denidove.Logistics.security;
 
-import com.denidove.Logistics.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-
-import java.util.List;
 
 @Configuration
 public class SecurityConfiguration {
 
     @Autowired
-    private UserRepository userRepository;
+    private CustomWebAuthenticationDetailsSource authenticationDetailsSource;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -29,13 +30,46 @@ public class SecurityConfiguration {
         return new BCryptPasswordEncoder();
     }
 
+
+    @Bean
+    public UserDetailsService userDetailsService() {
+        return new CustomUserDetailsService();
+    }
+
+
+    // Один из вариантов подключения кастомного AuthenticationProvider.
+    // Мы его встраиваем в конфигурацию AuthenticationManager
+
+    /*
+    @Bean
+    public AuthenticationManager authManager(HttpSecurity http) throws Exception {
+        AuthenticationManagerBuilder authenticationManagerBuilder =
+                http.getSharedObject(AuthenticationManagerBuilder.class);
+        CustomAuthenticationProvider authProvider = new CustomAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService());
+        authenticationManagerBuilder.authenticationProvider(authProvider);
+        return authenticationManagerBuilder.build();
+    }
+    */
+
+    @Bean
+    public DaoAuthenticationProvider authProvider() {
+        CustomAuthenticationProvider authProvider = new CustomAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService()); // Depricated
+        authProvider.setPasswordEncoder(passwordEncoder());
+        return authProvider;
+    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         //http.httpBasic(Customizer.withDefaults());
         http.csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable);
+        //http.userDetailsService(userDetailsService()); // Не работает для установки кастомного userDetailsService
+        //http.authenticationProvider(authProvider()); // Spring автоматически подхватывает этот бин authProvider()
         http.formLogin(
                 form -> form
+                        .authenticationDetailsSource(authenticationDetailsSource)
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
                         //.defaultSuccessUrl("/products", true)
@@ -43,8 +77,8 @@ public class SecurityConfiguration {
                             //userSessionService.persistProductInCart(); // записываем добавленные товары неавторизованного пользователя
                             resp.setStatus(HttpStatus.OK.value());
                             resp.sendRedirect("/"); // переход на главную страницу
-                        })
-                        .permitAll());
+                        }).permitAll());
+
         //toDo сделать нормальные инициалы в шаблоне orderok.html
 
         http.authorizeHttpRequests(

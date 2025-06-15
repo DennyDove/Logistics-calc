@@ -14,11 +14,13 @@ import org.springframework.context.annotation.Bean;
 @SpringBootApplication
 public class LogisticsApplication {
 
-	private final UserService userService;
+	//private final UserService userService;
 
+	/*
 	public LogisticsApplication(UserService userService) {
 		this.userService = userService;
 	}
+ 	*/
 
 	private static final Logger log = LoggerFactory.getLogger(LogisticsApplication.class);
 

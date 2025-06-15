@@ -42,8 +42,8 @@ public class MainController {
         if(userService.verify(code)) {
             System.out.println("Verification confirmed!");
         }
-        return "redirect:/";
-        //return "success.html";
+        //return "redirect:/";
+        return "success_verify.html";
     }
 
 }

@@ -31,7 +31,8 @@
             <form th:action="@{/login}" method="post">
               <h1> Вход в систему </h1>
               <p><input type="text" name="username" placeholder="Ваш логин" id="login"></p>
-              <p ><input type="password" name="password" placeholder="Ваш Пароль" id="password"></p>
+              <p><input type="password" name="password" placeholder="Ваш Пароль" id="password"></p>
+              <p><input type='text' name="code" placeholder="Код подтверждения"/></p>
               <a href="/registration"> Зарегистрироваться </a>
               <p><input type="submit" value=" Войти " /></p>
             </form>
