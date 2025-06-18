@@ -49,6 +49,42 @@ public class EmailService {
         }
     }
 
+    public void sendEmail_2(String recipient, String code) {
+
+        Properties props = new Properties();
+        Properties conf = new Properties();
+
+        try {
+            conf = loadProperties();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        props.put("mail.smtp.auth", conf.getProperty("mail.smtp.auth"));
+        props.put("mail.smtp.ssl.enable", conf.getProperty("mail.smtp.ssl.enable"));
+        props.put("mail.smtp.host", conf.getProperty("mail.smtp.host"));
+        props.put("mail.smtp.port", conf.getProperty("mail.smtp.port"));
+        props.put("mail.smtp.username", conf.getProperty("mail.smtp.username"));
+        props.put("mail.smtp.password", conf.getProperty("mail.smtp.password"));
+
+        Session session = Session.getDefaultInstance(props);
+        session.setDebug(true); // для вывода в консоль процесса отправки письма
+
+        try {
+            Message message = buidMsg2(session, props.getProperty("mail.smtp.username"),
+                    recipient, code);
+            Transport.send(message, props.getProperty("mail.smtp.username"),
+                    props.getProperty("mail.smtp.password"));
+        } catch (
+                MessagingException m) {
+            m.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
     public Properties loadProperties() throws IOException {
         Properties configuration = new Properties();
         InputStream inputStream = EmailService.class
@@ -72,6 +108,34 @@ public class EmailService {
         String msg = "Привет всем! <br>" +
                 "Please click the link below to verify your registration" +
                 "<a href=\"" + verifyUrl + "\"> Verify account </a>";
+
+        //toDo Для отправки вложений (картинки и т.д.)
+
+        MimeBodyPart mimeBodyPart = new MimeBodyPart();
+        mimeBodyPart.setContent(msg, "text/html; charset=utf-8");
+
+        //MimeBodyPart fileAttachment = new MimeBodyPart();
+        //fileAttachment.attachFile("d:/DennyDove/Photos/WhatsApp Image 2024-12-08 at 13.29.14 (1).jpeg");
+
+        Multipart multipart = new MimeMultipart();
+        multipart.addBodyPart(mimeBodyPart);
+        //multipart.addBodyPart(fileAttachment);
+        message.setContent(multipart);
+
+        return message;
+    }
+
+    public Message buidMsg2(Session session, String sender, String recipient, String verifyCode) throws MessagingException, IOException {
+        Message message = new MimeMessage(session); //new MimeMessage(session);
+
+        message.setFrom(new InternetAddress(sender));
+        message.setRecipients(
+                Message.RecipientType.TO, InternetAddress.parse(recipient));
+        message.setSubject("Mail Subject");
+
+        String msg = "Привет всем! <br>" +
+                "Here is you verification code"
+                 + verifyCode;
 
         //toDo Для отправки вложений (картинки и т.д.)
 

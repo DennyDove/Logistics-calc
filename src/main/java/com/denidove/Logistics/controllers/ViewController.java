@@ -1,22 +1,35 @@
 package com.denidove.Logistics.controllers;
 
 import com.denidove.Logistics.dto.TaskDto;
+import com.denidove.Logistics.dto.UserDto;
+import com.denidove.Logistics.email.EmailService;
 import com.denidove.Logistics.entities.SecurityUser;
 import com.denidove.Logistics.entities.User;
 import com.denidove.Logistics.entities.Task;
 import com.denidove.Logistics.enums.City;
+import com.denidove.Logistics.exceptions.CredentialsException;
+import com.denidove.Logistics.repositories.UserRepository;
 import com.denidove.Logistics.services.UserSessionService;
+import net.bytebuddy.utility.RandomString;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import javax.swing.text.TabableView;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 public class ViewController {
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private EmailService emailService;
 
     private final UserSessionService userSessionService;
 
@@ -40,7 +53,6 @@ public class ViewController {
 
         model.addAttribute("task", taskDto);
         model.addAttribute("cities", cities);
-
 
         // Очень важно добавить элемент "task" для работы с <form th:action="@{/order}" method="post" th:object="${task}">
         // Не получилось реализовать отображение сохраненного неавторизованным пользователем задания
@@ -70,8 +82,34 @@ public class ViewController {
         }
     }
 
-    @GetMapping("/login")
-    public String login() {
+    @GetMapping("/login-1")
+    public String login_1(Model model, UserDto userDto) {
+        //User user = new User();
+        model.addAttribute("user", userDto);
+
+        return "login_1.html";
+    }
+
+    @PostMapping("/login-2")
+    public String login_2(Model model, @ModelAttribute("user") UserDto userDto) {
+
+        Optional<User> userOpt = userRepository.findUserByLogin(userDto.getLogin());
+
+        if(userOpt.isEmpty()) throw new CredentialsException("Введены некорректнык данные!");
+
+        User user = userOpt.get();
+
+        Boolean is2FAuth = false;
+
+        //if(is2FAuth) {
+            String randomCode = RandomString.make(7);
+            user.setVerificationCode(randomCode);
+            userRepository.save(user);
+            emailService.sendEmail_2(user.getEmail(), randomCode);
+        //}
+
+
+        model.addAttribute("user", userDto);
         return "login.html";
     }
 
@@ -109,7 +147,6 @@ public class ViewController {
         SecurityUser user = userSessionService.getSecurityUser();
         var userInit = user.getInitials();
         model.addAttribute("orderId", id);
-
         return "order_ok.html";
     }
 }

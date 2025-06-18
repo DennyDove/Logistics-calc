@@ -14,13 +14,11 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 public class MainController {
 
-    private final UserSessionService userSessionService;
     private final UserService userService;
     private final TaskService taskService;
 
-    public MainController(UserSessionService userSessionService, TaskService taskService,
+    public MainController(TaskService taskService,
                           UserService userService) {
-        this.userSessionService = userSessionService;
         this.userService = userService;
         this.taskService = taskService;
     }
@@ -38,7 +36,7 @@ public class MainController {
     }
 
     @GetMapping("/verify")
-    public String saveOrderDto(Model model, @RequestParam("code") String code) {
+    public String saveOrderDto1(Model model, @RequestParam("code") String code) {
         if(userService.verify(code)) {
             System.out.println("Verification confirmed!");
         }

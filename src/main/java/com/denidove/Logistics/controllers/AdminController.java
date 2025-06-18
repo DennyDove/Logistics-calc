@@ -18,13 +18,12 @@ public class AdminController {
 
     private final UserSessionService userSessionService;
     private final TaskService taskService;
-    private final UserService userService;
+    //private final UserService userService;
 
-    public AdminController(UserSessionService userSessionService, TaskService taskService,
-                           UserService userService) {
+    public AdminController(UserSessionService userSessionService, TaskService taskService) {
         this.userSessionService = userSessionService;
         this.taskService = taskService;
-        this.userService = userService;
+        //this.userService = userService;
     }
 
     @GetMapping("/admin-lk")

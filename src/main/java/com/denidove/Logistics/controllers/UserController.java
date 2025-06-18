@@ -44,9 +44,6 @@ public class UserController {
         //return "register_success";
     }
 
-
-
-
     private String getSiteURL(HttpServletRequest request) {
         String siteURL = request.getRequestURL().toString();    // "http://localhost:8080/adduser"
         String deleteStr = request.getServletPath().toString(); // "/adduser"
