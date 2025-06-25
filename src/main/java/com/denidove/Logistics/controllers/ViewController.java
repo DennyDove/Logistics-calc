@@ -9,7 +9,9 @@ import com.denidove.Logistics.entities.Task;
 import com.denidove.Logistics.enums.City;
 import com.denidove.Logistics.exceptions.CredentialsException;
 import com.denidove.Logistics.repositories.UserRepository;
+import com.denidove.Logistics.services.PostRequestService;
 import com.denidove.Logistics.services.UserSessionService;
+import jakarta.servlet.http.HttpServletRequest;
 import net.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import javax.swing.text.TabableView;
 import java.util.List;
@@ -30,6 +33,9 @@ public class ViewController {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private PostRequestService postRequestService;
 
     private final UserSessionService userSessionService;
 
@@ -91,26 +97,34 @@ public class ViewController {
     }
 
     @PostMapping("/login-2")
-    public String login_2(Model model, @ModelAttribute("user") UserDto userDto) {
+    public String login_2(Model model, @ModelAttribute("user") UserDto userDto, HttpServletRequest request) {
 
-        Optional<User> userOpt = userRepository.findUserByLogin(userDto.getLogin());
+        Optional<User> userOpt = userRepository.findUserByLogin(userDto.getUsername());
 
         if(userOpt.isEmpty()) throw new CredentialsException("Введены некорректнык данные!");
 
+        //String loginServiceUrl = request.getContextPath();
+
+        //postRequestService.sendLoginRequest(request, userDto);
+
+        Boolean is2FAuth = true;
+
         User user = userOpt.get();
 
-        Boolean is2FAuth = false;
-
-        //if(is2FAuth) {
+        if(is2FAuth) {
             String randomCode = RandomString.make(7);
             user.setVerificationCode(randomCode);
             userRepository.save(user);
             emailService.sendEmail_2(user.getEmail(), randomCode);
-        //}
 
-
-        model.addAttribute("user", userDto);
-        return "login.html";
+            model.addAttribute("is2FAuth", is2FAuth);
+            model.addAttribute("user", userDto);
+            return "login.html";
+        } else {
+            model.addAttribute("is2FAuth", is2FAuth);
+            return "login.html";
+        }
+        //return "redirect:/";
     }
 
     @GetMapping("/registration")

@@ -14,22 +14,51 @@ let form = document.getElementById("form");
 let regButton = document.getElementById("regButton");
 
 let correctPassword = false;
+let correctAge = false;
+let correctEmail = false;
 
+let emailPattern = new RegExp("[a-zA-Z0-9.-~_]+@[a-zA-Z0-9.]+[\.]");  //+([\w-]+\.)+[a-zA-Z0-9]");   //+[\w]");
+                                  // почему-то здесь не работает /w
 
 // Проверка совпадения паролей
 function checkPassword() {
     const password = form.password.value;
     const confirmPassword = form.confirmPassword.value;
     if (password != confirmPassword) {
-        errorMessage.className = "show-error";
+        errorPassword.className = "show-error";
         correctPassword = false;
 
     }
     else {
-        errorMessage.className = "hide-error";
+        errorPassword.className = "hide-error";
         correctPassword = true;
     }
 }
+
+function checkAge() {
+    const age = form.age.value;
+    if (age < 16 || age > 100) {
+        errorAge.className = "show-error";
+        correctAge = false;
+    }
+    else {
+        errorAge.className = "hide-error";
+        correctAge = true;
+    }
+}
+
+function checkEmail() {
+    const email = form.email.value;
+    if (emailPattern.test(email) === false) {
+        errorEmail.className = "show-error";
+        correctEmail = false;
+    }
+    else {
+        errorEmail.className = "hide-error";
+        correctEmail = true;
+    }
+}
+
 
 // Регистрация нового пользователя
 async function createUser() {
@@ -63,6 +92,14 @@ confirmPassword.addEventListener("keyup", function() {
   checkPassword();
 });
 
+age.addEventListener("keyup", function() {
+  checkAge();
+});
+
+email.addEventListener("keyup", function() {
+  checkEmail();
+});
+
 regButton.addEventListener("click", function() {
-    if(correctPassword === true) createUser();
+    if(correctPassword === true && correctAge === true && correctEmail) createUser();
 });

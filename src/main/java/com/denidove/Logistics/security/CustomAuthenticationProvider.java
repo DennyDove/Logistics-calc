@@ -65,7 +65,7 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
         }
         */
 
-        Boolean is2FAuth = false;
+        Boolean is2FAuth = true;
 
         String username = auth.getName();
         String password = auth.getCredentials().toString();
@@ -75,10 +75,10 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
         String codeFromDb = ((SecurityUser) u).getUser().getVerificationCode();
 
 
-        //if(is2FAuth) {
-            if (!verificationCode.equals(codeFromDb)) {
-                throw new VerificationCodeErrorException("Введен неверный код подтверждения!");
-        //    }
+        if(is2FAuth) {
+                if (!verificationCode.equals(codeFromDb)) {
+                    throw new VerificationCodeErrorException("Введен неверный код подтверждения!");
+                }
             }
 
         if (passwordEncoder.matches(password, u.getPassword())) {
@@ -94,7 +94,6 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
         return new UsernamePasswordAuthenticationToken(
                 securityUser, result.getCredentials(), result.getAuthorities());
         */
-
 
     }
 

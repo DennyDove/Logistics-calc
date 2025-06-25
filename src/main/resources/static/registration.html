@@ -23,11 +23,13 @@
         <p><input type="text" placeholder="Ваше имя" id="name"></p>
         <p><input type="text" placeholder="Ваш логин" id="login"></p>
         <p><input type="number" placeholder="Ваш возраст" id="age"></p>
+        <div class="hide-error" id="errorAge"><p> Возраст должен быть в диапазоне от 16 до 100 лет :) </p></div>
         <p><input type="email" placeholder="Ваш e-mail" id="email"></p>
+        <div class="hide-error" id="errorEmail"><p> Некорректно введен e-mail </p></div>
         <p><input type="password" placeholder="Пароль" id="password"></p>
         <p><input type="password" placeholder="Подтвердите пароль" id="confirmPassword"></p>
       </form>
-      <div class="hide-error" id="errorMessage">Пароли не совпадают</div>
+      <div class="hide-error" id="errorPassword">Пароли не совпадают</div>
       <p><button id="regButton">Зарегистрироваться</button></p>
     </div>
 

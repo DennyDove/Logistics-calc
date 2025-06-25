@@ -27,14 +27,15 @@
             <div th:if="${errorMessage}">
         			Упс... Неверный пароль или имя пользователя.</div>
             <div th:if="${param.error}">
-          			Упс... Неправильно введен одноразовый код!</div>
+          			Упс... Неверный логин, пароль или одноразовый код!</div>
 
         		<div th:if="${param.logout}">
         			Вы вышли из профиля.</div>
             <form th:action="@{/login-2}" method="post" th:object="${user}">
               <h1> Вход в систему </h1>
-              <p><input type="text" placeholder="Ваш логин" id="login" th:field="*{login}"></p>
+              <p><input type="text" placeholder="Ваш логин" id="login" th:field="*{username}"></p>
               <p><input type="password" placeholder="Ваш Пароль" id="password" th:field="*{password}"></p>
+              <p> <a href="/registration"> Зарегистрироваться </a> </p>
               <p><input type="submit" value=" Войти " /></p>
             </form>
             <!-- <p><button id="loginButton"> Войти </button></p> -->

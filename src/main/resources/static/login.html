@@ -28,14 +28,26 @@
         			Неверный пароль или имя пользователя.</div>
         		<div th:if="${param.logout}">
         			Вы вышли из профиля.</div>
+
+            <div th:if="${is2FAuth == true}">
+              <form th:action="@{/login}" method="post">
+                <h1> Вход в систему </h1>
+                 <p><input type="hidden" name="username" placeholder="Ваш логин" id="login" th:value="${user.username}"></p>
+                 <p><input type="hidden" name="password" placeholder="Ваш Пароль" id="password" th:value="${user.password}"></p>
+                <p><input type='text' name="code" placeholder="Код подтверждения"/></p>
+                <p><input type="submit" value=" Войти " /></p>
+              </form>
+          </div>
+          <div th:if="${is2FAuth == false}">
             <form th:action="@{/login}" method="post">
               <h1> Вход в систему </h1>
-               <p><input type="hidden" name="username" placeholder="Ваш логин" id="login" th:value="${user.login}"></p>
+               <p><input type="hidden" name="username" placeholder="Ваш логин" id="login" th:value="${user.username}"></p>
                <p><input type="hidden" name="password" placeholder="Ваш Пароль" id="password" th:value="${user.password}"></p>
-              <p><input type='text' name="code" placeholder="Код подтверждения"/></p>
-              <a href="/registration"> Зарегистрироваться </a>
+               <P> Продолжить без 2-х факторной аутентификации </p>
               <p><input type="submit" value=" Войти " /></p>
             </form>
+        </div>
+
             <!-- <p><button id="loginButton"> Войти </button></p> -->
           </div>
         </div>
