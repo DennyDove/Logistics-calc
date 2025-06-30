@@ -6,21 +6,20 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
 
+import java.nio.DoubleBuffer;
+
 @Getter
 @Setter
 @NoArgsConstructor
 public class TaskDto {
 
-
-
     private String cargoName;
-
     private City startPoint;
-
     private City destination;
-
     private Double distance;
-
+    private Double length;
+    private Double width;
+    private Double height;
     private Double weight;
 
     private TaskStatus status;

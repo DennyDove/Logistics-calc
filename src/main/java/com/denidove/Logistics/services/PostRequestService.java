@@ -7,15 +7,24 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.util.JSONPObject;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.Getter;
+import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashMap;
+
 
 @Component
 public class PostRequestService {
 
+    private static final Logger log = LoggerFactory.getLogger(PostRequestService.class);
     private final RestTemplate rest;
     private final ObjectMapper mapper;
 
@@ -29,7 +38,7 @@ public class PostRequestService {
         this.mapper = mapper;
     }
 
-    public String sendLogisticTestRequest() throws JsonProcessingException {
+    public LinkedHashMap sendVozovozRequest(String start, String finish, String volume, String weight) throws JsonProcessingException {
 
         logisticServiceUrl = "https://vozovoz.org/api/";
 
@@ -37,54 +46,34 @@ public class PostRequestService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        //var rawJson = new RawJson();
-        //String rawBody = rawJson.getRawJsonData();
-
-        var logistics = new Logistics();
-
-        Params params = new Params();
-        Cargo cargo = new Cargo();
-        Dimension dimension = new Dimension();
-        dimension.setQuantity("1");
-        dimension.setVolume("0.1");
-        dimension.setWeight("0.9");
-
-        cargo.setDimension(dimension);
-        params.setCargo(cargo);
-
-        Gateway gateway = new Gateway();
-        Dispatch dispatch = new Dispatch();
-        Destination destination = new Destination();
-        Point point1 = new Point();
-        point1.setLocation("Москва");
-        point1.setTerminal("default");
-
-        Point point2 = new Point();
-        point2.setLocation("Саратов");
-        point2.setTerminal("default");
-
-        dispatch.setPoint(point1);
-        destination.setPoint(point2);
-
-        gateway.setDispatch(dispatch);
-        gateway.setDestination(destination);
-
-        params.setGateway(gateway);
-        params.setDestination(destination);
-
-        logistics.setObject("price");
-        logistics.setAction("get");
-        logistics.setParams(params);
+        var logistics = vozovozObjectToJson("1", volume, weight, start, finish);
 
         mapper.writeValueAsString(logistics);
 
-
-
         HttpEntity<Logistics> request = new HttpEntity<>(logistics, headers);
 
-        ResponseEntity<String> response =
-                rest.exchange(url, HttpMethod.POST, request, String.class);
+        ResponseEntity<LinkedHashMap<String, LinkedHashMap>> response =
+                rest.exchange(url, HttpMethod.POST, request, new ParameterizedTypeReference<>() {});
+        return response.getBody();
+    }
 
+    public LinkedHashMap sendDelLineRequest(String startPoint, String destination, Double length, Double width,
+                                            Double height, String volume, String totalWeight) throws JsonProcessingException {
+
+        logisticServiceUrl = "https://api.dellin.ru/v2/calculator";
+
+        String url = logisticServiceUrl; //+ "?token=G934UM29wXG2IKYS9iX9oKQCeojkApHSEWAxOC5v";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        var logistics = delLineObjectToJson("DADF6BBF-7EE8-40A0-9118-C169FBD949C4", startPoint, destination,
+                length, width, height, volume, totalWeight);
+        mapper.writeValueAsString(logistics);
+
+        HttpEntity<DelLine> request = new HttpEntity<>(logistics, headers);
+
+        ResponseEntity<LinkedHashMap<String, LinkedHashMap>> response =
+                rest.exchange(url, HttpMethod.POST, request, new ParameterizedTypeReference<>() {});
         return response.getBody();
     }
 
@@ -129,5 +118,39 @@ public class PostRequestService {
         baseUrl.append(contextPath);
 
         return baseUrl.toString();
+    }
+
+    private Logistics vozovozObjectToJson(String quantity, String volume, String weight, String start, String finish) {
+        var dimension = new Logistics.Params.Cargo.Dimension(quantity, volume, weight);
+        var cargo = new Logistics.Params.Cargo(dimension);
+
+        var point1 = new Logistics.Params.Gateway.Point(start, "default");
+        var point2 = new Logistics.Params.Gateway.Point(finish, "default");
+        var dispatch = new Logistics.Params.Gateway.Dispatch(point1);
+        var destination = new Logistics.Params.Gateway.Destination(point2);
+        var gateway = new Logistics.Params.Gateway(dispatch, destination);
+
+        var params = new Logistics.Params(cargo, gateway);
+        return new Logistics("price", "get", params);
+    }
+
+    private DelLine delLineObjectToJson(String appkey, String start, String finish, Double length, Double width, Double height, String volume, String totalWeight) {
+        var deliveryType = new DelLine.Delivery.DeliveryType("auto");
+        var address1 = new DelLine.Delivery.Address(start);
+        //var address2 = new DelLine.Delivery.Address("47.204150, 39.701188");
+        var address2 = new DelLine.Delivery.Address(finish);
+        var time = new DelLine.Delivery.Time("9:30", "19:00");
+        var derival = new DelLine.Delivery.Derival("address", "2025-07-02", time, address1);
+        var requirements = new String[]{"0x818e8ff1eda1abc349318a478659af08"};
+        var arrival = new DelLine.Delivery.Arrival("address", address2, time, requirements);
+        var packages = new DelLine.Delivery.Packages[]{new DelLine.Delivery.Packages("0xad97901b0ecef0f211e889fcf4624fea", 1)};
+        var delivery = new DelLine.Delivery(deliveryType, derival, arrival, packages);
+
+        var paymentCitySearch = new DelLine.Payment.PaymentCitySearch("Москва");
+        var payment = new DelLine.Payment(paymentCitySearch, "cash");
+
+        var cargo = new DelLine.Cargo(1, length.floatValue(), width.floatValue(), height.floatValue(), Float.parseFloat(volume), Float.parseFloat(totalWeight));
+
+        return new DelLine(appkey, delivery, payment, cargo);
     }
 }

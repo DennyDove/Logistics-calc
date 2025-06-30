@@ -65,7 +65,7 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
         }
         */
 
-        Boolean is2FAuth = true;
+        Boolean is2FAuth = false;
 
         String username = auth.getName();
         String password = auth.getCredentials().toString();

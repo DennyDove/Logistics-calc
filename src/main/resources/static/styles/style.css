@@ -41,6 +41,17 @@ body, html {
     display: none;
 }
 
+/* Для отображения блока*/
+.show{
+    color: red;
+    display: block;
+}
+
+/* Для скрытия блока*/
+.hide{
+    display: none;
+}
+
 /* Для отображения сообщения об ошибке*/
 .show-error{
     color: red;
@@ -231,6 +242,16 @@ div.logictic_calc {
 	background-color: #99CCCC;
 	*/
 
+}
+
+div.dimensions {
+	display: inline-block;
+	position: relative;
+	vertical-align: top;
+	margin-bottom: 23px;
+
+	color: #7d7f7d;
+	/* background-color: #99CCCC; */
 }
 
 div.item_card {

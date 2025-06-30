@@ -54,9 +54,8 @@ public class ViewController {
         boolean loginStatus = userSessionService.getAuthStatus();
 
         List<City> cities = List.of(City.Moscow, City.Piter, City.Saratov, City.Vologda);
-        //Task task = new Task();
-        TaskDto taskDto = new TaskDto();
 
+        TaskDto taskDto = new TaskDto();
         model.addAttribute("task", taskDto);
         model.addAttribute("cities", cities);
 
@@ -67,6 +66,7 @@ public class ViewController {
             model.addAttribute("task", taskDto);
             model.addAttribute("cities", cities);
         } else {*/
+
         if(!userSessionService.getTaskDto().isEmpty()) {
             taskDto = userSessionService.getTaskDto().getFirst();
             model.addAttribute("task", taskDto); // сделать Optional ?
@@ -78,7 +78,6 @@ public class ViewController {
             var userInit = user.getInitials();
             int coinsInCart = 0;
             //int coinsInCart = cartItemService.findAllByUserIdAndStatus().size();
-            //model.addAttribute("task", task);
             model.addAttribute("userInit", userInit);
             model.addAttribute("coinsInCart", coinsInCart);
             model.addAttribute("name", user.getUsername());
@@ -104,10 +103,9 @@ public class ViewController {
         if(userOpt.isEmpty()) throw new CredentialsException("Введены некорректнык данные!");
 
         //String loginServiceUrl = request.getContextPath();
-
         //postRequestService.sendLoginRequest(request, userDto);
 
-        Boolean is2FAuth = true;
+        Boolean is2FAuth = false;
 
         User user = userOpt.get();
 

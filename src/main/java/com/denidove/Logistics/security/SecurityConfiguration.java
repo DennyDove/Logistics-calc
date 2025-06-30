@@ -121,7 +121,7 @@ public class SecurityConfiguration {
                     //              указываем паттерн "/**" т.к у нас в уже установлено "spring.thymeleaf.prefix=classpath:/static/"
                     requests.requestMatchers("/js/**", "/styles/**", "/images/**", "/",
                                     "/registration", "/adduser", "/verify", "/verify2", "/confirm", "/login-2", "/login", "/login-1**").permitAll();
-                    requests.requestMatchers(HttpMethod.POST,"/order-dto", "login").permitAll();
+                    requests.requestMatchers(HttpMethod.POST,"/order-dto", "/calc", "/order", "login").permitAll();
                     requests.requestMatchers(HttpMethod.GET, "/admin-lk", "/active-orders").hasAuthority("Admin");
                     requests.anyRequest().authenticated();
                 }

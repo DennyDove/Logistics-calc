@@ -27,6 +27,7 @@ async function taskOrder() {
     let output = document.getElementById("message");
     //output.textContent = "Заказ №"+ responseObject.id + " оформлен";
     //message.className = "show-message"; // появляется сообщение
+
     window.location.replace("/order-ok?id=" + responseObject.id);
 
   } else {

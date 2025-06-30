@@ -40,34 +40,52 @@
         <div class="logictic_calc">
           <h1>Рассчитать стоимость доставки</h1>
           <br>
-          <form th:action="@{/order-dto}" method="post" th:object="${task}">
-          <!--<h2>Пункт отправления</h2>-->
-          <label for="cityList">Пункт отправления:</label>
-          <select id="cityList" th:field="*{startPoint}">
-            <option th:each="c : ${cities}" th:value="${c}" th:text="${c.name}"></option>
-          </select>
-          <br>
-          <br>
-      <!--<h2>Пункт назначения</h2>-->
-          <label for="cityList">Пункт назначения:</label>
-          <select id="cityList" th:field="*{destination}">
-            <option th:each="c : ${cities}" th:value="${c}" th:text="${c.name}"></option>
-          </select>
+          <form th:action="@{/order-dto}" method="post" th:object="${task}" id="form">
+
+            <!--<h2>Пункт отправления</h2>-->
+            <label for="cityList">Пункт отправления:</label>
+            <select id="cityList" th:field="*{startPoint}">
+              <option th:each="c : ${cities}" th:value="${c}" th:text="${c.name}"></option>
+            </select>
+            <br>
+            <br>
+            <!--<h2>Пункт назначения</h2>-->
+            <label for="cityList">Пункт назначения:</label>
+            <select id="cityList" th:field="*{destination}">
+              <option th:each="c : ${cities}" th:value="${c}" th:text="${c.name}"></option>
+            </select>
               <br>
               <br>
               <input type="text" th:field="*{cargoName}" placeholder="Тип груза"> Тип груза</input>
               <br>
               <br>
+
+              <div class="dimensions">
+                <input type="text" th:field="*{length}" placeholder="Длина" value="0.1" id="qty_input1"> Д </input>
+                <input type="text" th:field="*{width}" placeholder="Ширина" value="0.2" id="qty_input1"> Ш </input>
+                <input type="text" th:field="*{height}" placeholder="Высота" value="0.3" id="qty_input1"> В </input>
+              </div>
+              Размеры, м
+              <br>
               <input type="text" th:field="*{weight}" placeholder="Вес груза"> Вес груза, кг.</input>
               <br>
               <br>
-              <button type="submit">Рассчитать</button>
-            </form>
+          <button type="submit">Рассчитать</button>
+          </form>
+
+          <div class="hide" id="loading" style="margin-top: 15px"> <img src="images/loading1.gif" width="87" height="23" border="0"> </div>
+
+
+          <div id="results" style="margin-top: 12px" th:if="${price}">
+            <img src="images/vozovoz.jpg" width="87" height="23" border="0"> <div style="position: relative; bottom: 5px; display: inline-block"> [[${price}]] руб. </div> </div>
+          <div id="results" style="margin-top: 12px" th:if="${price2}">
+            <img src="images/delline.jpg" width="87" height="23" border="0"> <div style="position: relative; bottom: 5px; display: inline-block"> [[${price2}]] руб. </div> </div>
         </div>
 
       </div>
 
   </div>
+  <script src="js/script_animation.js"></script>
 
 </body>
 </html>

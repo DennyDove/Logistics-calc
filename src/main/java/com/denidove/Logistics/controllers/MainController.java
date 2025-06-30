@@ -4,6 +4,7 @@ import com.denidove.Logistics.dto.TaskDto;
 import com.denidove.Logistics.dto.UserDto;
 import com.denidove.Logistics.entities.Task;
 import com.denidove.Logistics.entities.User;
+import com.denidove.Logistics.enums.City;
 import com.denidove.Logistics.services.PostRequestService;
 import com.denidove.Logistics.services.TaskService;
 import com.denidove.Logistics.services.UserService;
@@ -13,6 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.LinkedHashMap;
+import java.util.List;
 
 @Controller
 public class MainController {
@@ -35,15 +39,16 @@ public class MainController {
         // @ModelAttribute("task") в данном случае уже не работает т.к. из формы удалено th:object
         // Только th:object работает с @ModelAttribute("task")
 
-        try {
-            System.out.println(postRequestService.sendLogisticTestRequest());
-        } catch (JsonProcessingException j) {
-            j.printStackTrace();
-        }
+        List<City> cities = List.of(City.Moscow, City.Piter, City.Saratov, City.Vologda);
+
 
         // Просто сохраняем состояние корзины неавторизованного пользователя
         taskService.saveToDto(taskDto);
+
         model.addAttribute("user", userDto);
+        model.addAttribute("task", taskDto); // сделать Optional ?
+        model.addAttribute("cities", cities);
+        //return "index_auth.html";
         return "login_1.html";
     }
 
