@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="content-type" content="text/html" charset="UTF-8">
+    <title>Main page</title>
+    <link href="styles/style.css" th:href="@{styles/style.css}" rel="stylesheet" type="text/css"/>
+
+    <!-- Подключение карт -->
+    <script src="https://maps.api.2gis.ru/2.0/loader.js?pkg=full"></script>
+    <script type="text/javascript">
+      var map;
+      DG.then(function () {
+          map = DG.map('map', {
+              center: [55.98, 37.89],
+              zoom: 13
+          });
+      });
+    </script>
+</head>
+<body>
+<!-- <h1>Клуб нумизматов</h1> -->
+<h3></h3>
+<!-- Основной контейнер, включающий остальные DIV-->
+  <div id="container">
+
+      <div class="header">
+        <div class="block_logo"> <a href="/"> <img src="images/logo.jpg" width="477" height="153" border="0"> </a> </div>
+        <div class="block_holder1">
+          <div class="profile"> <a href="/user-lk"> <img src="images/profile1.png" width="33" height="33" border="0"> <div class="auth_user"> [[${userInit}]] </div> </a> </div>
+          <div class="cart"> <a href="/"> <img th:if="${coinsInCart == 0}" src="images/shopping_cart.png" width="53" height="53" border="0">
+                                              <img th:if="${coinsInCart > 0}" src="images/shopping_cart1.png" width="53" height="53" border="0"> </a> </div>
+        </div>
+      </div>
+      <div class="line1"></div>
+      <div id="content_container">
+
+        <div id="map" style="display: inline-block; vertical-align: top; margin-left: 30px; margin-top: 30px; width: 600px;	height: 400px;"> </div>
+
+        <div class="logictic_calc">
+          <h1>Рассчитать стоимость доставки</h1>
+          <br>
+            <form id="form">
+                <!--<h2>Пункт отправления</h2>-->
+                <label for="startPoint">Пункт отправления:</label>
+                <select id="startPoint" th:value="${task.startPoint}">
+                  <option th:each="c : ${cities}" th:value="${c}" th:text="${c.name}" th:selected="${c} == ${task.startPoint}"></option>
+                </select>
+                <br>
+                <br>
+                <!--<h2>Пункт назначения</h2>-->
+                <label for="destination">Пункт назначения:</label>
+                <select id="destination" th:value="${task.destination}">
+                  <option th:each="c : ${cities}" th:value="${c}" th:text="${c.name}" th:selected="${c} == ${task.destination}"></option>
+                </select>
+                <br>
+                <br>
+                <input type="text" id="cargoName" placeholder="Тип груза" th:value="${task.cargoName}"> Тип груза</input>
+                <br>
+                <br>
+                <div class="dimensions">
+                  <input type="text" placeholder="Длина" th:value="${task.length}" id="length_input1"> Д </input>
+                  <input type="text" placeholder="Ширина" th:value="${task.width}" id="width_input1"> Ш </input>
+                  <input type="text" placeholder="Высота" th:value="${task.heigth}" id="heigth_input1"> В </input>
+                </div>
+                Размеры, м
+                <br>
+                <input type="text" id="weigth" placeholder="Вес груза" th:value="${task.weigth}"> Вес груза, кг.</input>
+                <br>
+                <br>
+            </form>
+
+            <p><button id="orderButton">Рассчитать</button></p>
+
+            <div class="hide" id="loading" style="margin-top: 15px"> <img src="images/loading1.gif" width="87" height="23" border="0"> </div>
+
+            <div id="results" style="margin-top: 12px" th:if="${price}">
+              <img src="images/vozovoz.jpg" width="87" height="23" border="0"> <div style="position: relative; bottom: 5px; display: inline-block"> [[${price}]] руб. </div> </div>
+            <div id="results" style="margin-top: 12px" th:if="${price2}">
+              <img src="images/delline.jpg" width="87" height="23" border="0"> <div style="position: relative; bottom: 5px; display: inline-block"> [[${price2}]] руб. </div> </div>
+        </div>
+      </div>
+
+  </div>
+  <!-- Блок JavaScript лучше всего подключать здесь - в конце <body>, т.к. иначе не считываются элементы DOM-->
+  <!-- В шаблонизаторе Thymeleaf джава скрипт подключается особым образом. См. ниже  -->
+  <script th:src="@{js/script_order.js}"></script>
+</body>
+</html>

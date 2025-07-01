@@ -38,7 +38,7 @@ public class PostRequestService {
         this.mapper = mapper;
     }
 
-    public LinkedHashMap sendVozovozRequest(String start, String finish, String volume, String weight) throws JsonProcessingException {
+    public LinkedHashMap sendVozovozRequest(String start, String finish, String volume, String weigth) throws JsonProcessingException {
 
         logisticServiceUrl = "https://vozovoz.org/api/";
 
@@ -46,7 +46,7 @@ public class PostRequestService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        var logistics = vozovozObjectToJson("1", volume, weight, start, finish);
+        var logistics = vozovozObjectToJson("1", volume, weigth, start, finish);
 
         mapper.writeValueAsString(logistics);
 
@@ -58,7 +58,7 @@ public class PostRequestService {
     }
 
     public LinkedHashMap sendDelLineRequest(String startPoint, String destination, Double length, Double width,
-                                            Double height, String volume, String totalWeight) throws JsonProcessingException {
+                                            Double height, String volume, String totalWeight, String oversizedWeight, String oversizedVolume) throws JsonProcessingException {
 
         logisticServiceUrl = "https://api.dellin.ru/v2/calculator";
 
@@ -67,7 +67,7 @@ public class PostRequestService {
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         var logistics = delLineObjectToJson("DADF6BBF-7EE8-40A0-9118-C169FBD949C4", startPoint, destination,
-                length, width, height, volume, totalWeight);
+                length, width, height, volume, totalWeight, oversizedWeight, oversizedVolume);
         mapper.writeValueAsString(logistics);
 
         HttpEntity<DelLine> request = new HttpEntity<>(logistics, headers);
@@ -120,8 +120,8 @@ public class PostRequestService {
         return baseUrl.toString();
     }
 
-    private Logistics vozovozObjectToJson(String quantity, String volume, String weight, String start, String finish) {
-        var dimension = new Logistics.Params.Cargo.Dimension(quantity, volume, weight);
+    private Logistics vozovozObjectToJson(String quantity, String volume, String weigth, String start, String finish) {
+        var dimension = new Logistics.Params.Cargo.Dimension(quantity, volume, weigth);
         var cargo = new Logistics.Params.Cargo(dimension);
 
         var point1 = new Logistics.Params.Gateway.Point(start, "default");
@@ -134,13 +134,14 @@ public class PostRequestService {
         return new Logistics("price", "get", params);
     }
 
-    private DelLine delLineObjectToJson(String appkey, String start, String finish, Double length, Double width, Double height, String volume, String totalWeight) {
+    private DelLine delLineObjectToJson(String appkey, String start, String finish, Double length, Double width, Double height,
+                                        String volume, String totalWeight, String oversizedWeight, String oversizedVolume) {
         var deliveryType = new DelLine.Delivery.DeliveryType("auto");
         var address1 = new DelLine.Delivery.Address(start);
         //var address2 = new DelLine.Delivery.Address("47.204150, 39.701188");
         var address2 = new DelLine.Delivery.Address(finish);
         var time = new DelLine.Delivery.Time("9:30", "19:00");
-        var derival = new DelLine.Delivery.Derival("address", "2025-07-02", time, address1);
+        var derival = new DelLine.Delivery.Derival("address", "2025-07-05", time, address1);
         var requirements = new String[]{"0x818e8ff1eda1abc349318a478659af08"};
         var arrival = new DelLine.Delivery.Arrival("address", address2, time, requirements);
         var packages = new DelLine.Delivery.Packages[]{new DelLine.Delivery.Packages("0xad97901b0ecef0f211e889fcf4624fea", 1)};
@@ -149,7 +150,8 @@ public class PostRequestService {
         var paymentCitySearch = new DelLine.Payment.PaymentCitySearch("Москва");
         var payment = new DelLine.Payment(paymentCitySearch, "cash");
 
-        var cargo = new DelLine.Cargo(1, length.floatValue(), width.floatValue(), height.floatValue(), Float.parseFloat(volume), Float.parseFloat(totalWeight));
+        var cargo = new DelLine.Cargo(1, length.floatValue(), width.floatValue(), height.floatValue(),
+                Float.parseFloat(volume), Float.parseFloat(totalWeight), Float.parseFloat(oversizedWeight), Float.parseFloat(oversizedVolume));
 
         return new DelLine(appkey, delivery, payment, cargo);
     }

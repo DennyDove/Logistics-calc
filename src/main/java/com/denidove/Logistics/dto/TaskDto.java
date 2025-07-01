@@ -19,7 +19,7 @@ public class TaskDto {
     private Double distance;
     private Double length;
     private Double width;
-    private Double height;
+    private Double heigth;
     private Double weight;
 
     private TaskStatus status;

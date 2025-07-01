@@ -155,14 +155,20 @@ public class DelLine {
         private Float height;
         private Float totalVolume;
         private Float totalWeight;
+        private Float oversizedWeight;
+        private Float oversizedVolume;
 
-        public Cargo(Integer quantity, Float length, Float width, Float height, Float totalVolume, Float totalWeight) {
+        public Cargo(Integer quantity, Float length, Float width, Float height, Float totalVolume, Float totalWeight,
+                     Float oversizedWeight, Float oversizedVolume) {
             this.quantity = quantity;
             this.length = length;
             this.width = width;
             this.height = height;
             this.totalVolume = totalVolume;
             this.totalWeight = totalWeight;
+            this.oversizedWeight = oversizedWeight;
+            this.oversizedVolume = oversizedVolume;
         }
     }
 }
+

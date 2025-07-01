@@ -43,7 +43,7 @@ body, html {
 
 /* Для отображения блока*/
 .show{
-    color: red;
+    color: black;
     display: block;
 }
 
@@ -252,6 +252,21 @@ div.dimensions {
 
 	color: #7d7f7d;
 	/* background-color: #99CCCC; */
+}
+
+#length_input1 {
+	position: relative;
+	width: 33px;
+}
+
+#width_input1 {
+	position: relative;
+	width: 33px;
+}
+
+#heigth_input1 {
+	position: relative;
+	width: 33px;
 }
 
 div.item_card {
