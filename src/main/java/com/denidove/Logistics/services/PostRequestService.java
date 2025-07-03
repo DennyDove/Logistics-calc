@@ -142,9 +142,10 @@ public class PostRequestService {
         var address2 = new DelLine.Delivery.Address(finish);
         var time = new DelLine.Delivery.Time("9:30", "19:00");
         var derival = new DelLine.Delivery.Derival("address", "2025-07-05", time, address1);
-        var requirements = new String[]{"0x818e8ff1eda1abc349318a478659af08"};
+        //var requirements = new String[]{"0x818e8ff1eda1abc349318a478659af08"};
+        var requirements = new String[]{};
         var arrival = new DelLine.Delivery.Arrival("address", address2, time, requirements);
-        var packages = new DelLine.Delivery.Packages[]{new DelLine.Delivery.Packages("0xad97901b0ecef0f211e889fcf4624fea", 1)};
+        var packages = new DelLine.Delivery.Packages[]{new DelLine.Delivery.Packages("0xA6A7BD2BF950E67F4B2CF7CC3A97C111", 1)};
         var delivery = new DelLine.Delivery(deliveryType, derival, arrival, packages);
 
         var paymentCitySearch = new DelLine.Payment.PaymentCitySearch("Москва");

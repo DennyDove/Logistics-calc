@@ -80,7 +80,7 @@ public class CalcController {
             throw new CalcRequestException("Bad request 404!");
         }
 
-        String price = delivery.get("response").get("basePrice").toString();
+        //String price = delivery.get("response").get("basePrice").toString();
         String price2 = delivery2.get("data").get("price").toString();
 
         // Просто сохраняем состояние запроса пользователя
@@ -98,7 +98,7 @@ public class CalcController {
 
         model.addAttribute("cities", cities);
         model.addAttribute("user", userDto);
-        model.addAttribute("price", price);
+        //model.addAttribute("price", price);
         model.addAttribute("price2", price2);
         //toDo Сделать кнопку "Сохранить расчет"
 
