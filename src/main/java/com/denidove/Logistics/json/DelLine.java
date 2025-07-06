@@ -1,5 +1,6 @@
 package com.denidove.Logistics.json;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.GeneratedValue;
 import lombok.Getter;
 import lombok.Setter;
@@ -29,7 +30,14 @@ public class DelLine {
         private DeliveryType deliveryType;
         private Derival derival;
         private Arrival arrival;
-        private Packages[] packages;
+        @JsonIgnore
+        private Packages[] packages; //Параметр временно отключен
+
+        public Delivery(DeliveryType deliveryType, Derival derival, Arrival arrival) {
+            this.deliveryType = deliveryType;
+            this.derival = derival;
+            this.arrival = arrival;
+        }
 
         public Delivery(DeliveryType deliveryType, Derival derival, Arrival arrival, Packages[] packages) {
             this.deliveryType = deliveryType;

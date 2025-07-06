@@ -2,20 +2,13 @@ package com.denidove.Logistics.controllers;
 
 import com.denidove.Logistics.dto.TaskDto;
 import com.denidove.Logistics.dto.UserDto;
-import com.denidove.Logistics.entities.Task;
-import com.denidove.Logistics.entities.User;
 import com.denidove.Logistics.enums.City;
-import com.denidove.Logistics.services.PostRequestService;
 import com.denidove.Logistics.services.TaskService;
 import com.denidove.Logistics.services.UserService;
-import com.denidove.Logistics.services.UserSessionService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 
 @Controller
@@ -23,13 +16,10 @@ public class MainController {
 
     private final UserService userService;
     private final TaskService taskService;
-    private final PostRequestService postRequestService;
 
-    public MainController(TaskService taskService, UserService userService,
-                          PostRequestService postRequestService) {
+    public MainController(TaskService taskService, UserService userService) {
         this.userService = userService;
         this.taskService = taskService;
-        this.postRequestService = postRequestService;
     }
 
     @PostMapping("/order-dto")

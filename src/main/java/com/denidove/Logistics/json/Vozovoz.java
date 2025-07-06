@@ -5,12 +5,12 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class Logistics {
+public class Vozovoz {
     private String object;
     private String action;
     private Params params;
 
-    public Logistics(String object, String action, Params params) {
+    public Vozovoz(String object, String action, Params params) {
         this.object = object;
         this.action = action;
         this.params = params;
@@ -42,11 +42,30 @@ public class Logistics {
                 private String quantity;
                 private String volume;
                 private String weight;
+                private Max max;
 
-                public Dimension(String quantity, String volume, String weight) {
+                public Dimension(String quantity, String volume, String weight, Max max) {
+
                     this.quantity = quantity;
                     this.volume = volume;
                     this.weight = weight;
+                    this.max = max;
+                }
+
+                @Getter
+                @Setter
+                public static class Max {
+                    private Float length;
+                    private Float height;
+                    private Float width;
+                    private Float weight;
+
+                    public Max(Float length, Float height, Float width, Float weight) {
+                        this.length = length;
+                        this.height = height;
+                        this.width = width;
+                        this.weight = weight;
+                    }
                 }
             }
         }

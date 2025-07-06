@@ -5,23 +5,17 @@ import com.denidove.Logistics.dto.UserDto;
 import com.denidove.Logistics.email.EmailService;
 import com.denidove.Logistics.entities.SecurityUser;
 import com.denidove.Logistics.entities.User;
-import com.denidove.Logistics.entities.Task;
 import com.denidove.Logistics.enums.City;
 import com.denidove.Logistics.exceptions.CredentialsException;
 import com.denidove.Logistics.repositories.UserRepository;
-import com.denidove.Logistics.services.PostRequestService;
 import com.denidove.Logistics.services.UserSessionService;
 import jakarta.servlet.http.HttpServletRequest;
 import net.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 
-import javax.swing.text.TabableView;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,9 +27,6 @@ public class ViewController {
 
     @Autowired
     private EmailService emailService;
-
-    @Autowired
-    private PostRequestService postRequestService;
 
     private final UserSessionService userSessionService;
 

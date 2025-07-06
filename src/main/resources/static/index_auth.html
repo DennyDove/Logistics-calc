@@ -76,9 +76,17 @@
           <div class="hide" id="loading" style="margin-top: 15px"> <img src="images/loading1.gif" width="87" height="23" border="0"> </div>
 
           <div class="show" id="result1" style="margin-top: 12px" th:if="${price}">
-            <img src="images/vozovoz.jpg" width="87" height="23" border="0"> <div style="position: relative; bottom: 5px; display: inline-block"> [[${price}]] руб. </div> </div>
+            <img src="images/vozovoz.jpg" width="87" height="23" border="0"> <div style="position: relative; bottom: 5px; display: inline-block"> [[${price}]] руб. </div>
+            <div th:if="${errorDelline}">
+              Ошибка запроса к сервису "Возовоз" </div>
+          </div>
           <div class="show" id="result2" style="margin-top: 12px" th:if="${price2}">
-            <img src="images/delline.jpg" width="87" height="23" border="0"> <div style="position: relative; bottom: 5px; display: inline-block"> [[${price2}]] руб. </div> </div>
+            <img src="images/delline.jpg" width="87" height="23" border="0"> <div style="position: relative; bottom: 5px; display: inline-block"> [[${price2}]] руб. </div>
+            <div th:if="${errorDelline}">
+              Ошибка запроса к сервису "Деловые линии" </div>
+            <div th:if="${incorrectDimensionDelline}">
+              "Деловые линии": некорректные размеры груза </div>
+          </div>
         </div>
       </div>
 

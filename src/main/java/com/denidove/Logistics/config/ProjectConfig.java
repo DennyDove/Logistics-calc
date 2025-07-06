@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 
 @Configuration
-@ComponentScan //(basePackages = "com.denidove.Logistics")
+@ComponentScan //(basePackages = "com.denidove.Vozovoz")
 public class ProjectConfig {
 
     @Bean

@@ -1,13 +1,12 @@
-package com.denidove.Logistics.services;
+package com.denidove.Logistics.services.impl;
 
 import com.denidove.Logistics.email.EmailService;
 import com.denidove.Logistics.entities.Role;
 import com.denidove.Logistics.entities.User;
 import com.denidove.Logistics.repositories.RoleRepository;
 import com.denidove.Logistics.repositories.UserRepository;
-import jakarta.servlet.http.HttpServletRequest;
+import com.denidove.Logistics.services.UserService;
 import net.bytebuddy.utility.RandomString;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 

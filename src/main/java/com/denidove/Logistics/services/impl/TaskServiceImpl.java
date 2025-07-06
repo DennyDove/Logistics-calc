@@ -1,9 +1,11 @@
-package com.denidove.Logistics.services;
+package com.denidove.Logistics.services.impl;
 
 import com.denidove.Logistics.dto.TaskDto;
 import com.denidove.Logistics.entities.Task;
 import com.denidove.Logistics.enums.TaskStatus;
 import com.denidove.Logistics.repositories.TaskRepository;
+import com.denidove.Logistics.services.TaskService;
+import com.denidove.Logistics.services.UserSessionService;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;

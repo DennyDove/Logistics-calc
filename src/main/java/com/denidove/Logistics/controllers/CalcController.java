@@ -6,7 +6,10 @@ import com.denidove.Logistics.entities.SecurityUser;
 import com.denidove.Logistics.entities.Task;
 import com.denidove.Logistics.enums.City;
 import com.denidove.Logistics.exceptions.CalcRequestException;
-import com.denidove.Logistics.services.PostRequestService;
+import com.denidove.Logistics.exceptions.DellineRequestException;
+import com.denidove.Logistics.exceptions.IncorrectDimensionException;
+import com.denidove.Logistics.postreq.DellineService;
+import com.denidove.Logistics.postreq.VozService;
 import com.denidove.Logistics.services.TaskService;
 import com.denidove.Logistics.services.UserService;
 import com.denidove.Logistics.services.UserSessionService;
@@ -15,8 +18,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.swing.text.html.Option;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 public class CalcController {
@@ -24,14 +30,17 @@ public class CalcController {
     private final UserService userService;
     private  final UserSessionService userSessionService;
     private final TaskService taskService;
-    private final PostRequestService postRequestService;
+    private final VozService vozService;
+    private final DellineService dellineService;
 
-    public CalcController(TaskService taskService, UserService userService,
-                          PostRequestService postRequestService, UserSessionService userSessionService) {
+    public CalcController(TaskService taskService, UserService userService, VozService vozService,
+                          DellineService dellineService, UserSessionService userSessionService) {
         this.userService = userService;
         this.taskService = taskService;
+        this.vozService = vozService;
+        this.dellineService = dellineService;
         this.userSessionService = userSessionService;
-        this.postRequestService = postRequestService;
+
     }
 
     @PostMapping("/calc")
@@ -51,9 +60,9 @@ public class CalcController {
         String destination = taskDto.getDestination().getName();
         Double width = taskDto.getWidth();
         Double length = taskDto.getLength();
-        Double heigth = taskDto.getHeigth();
+        Double height = taskDto.getHeigth();
 
-        String volume = String.valueOf(width * length * heigth);
+        String volume = String.valueOf(width * length * height);
         String weight = String.valueOf(taskDto.getWeight());
         String oversizedVolume = volume;
         String oversizedWeight = weight;
@@ -61,8 +70,19 @@ public class CalcController {
         // Просто сохраняем состояние запроса пользователя
         taskService.saveToDto(taskDto);
 
+        String price = "";
+        String price2 = "";
+
         try {
-            delivery = postRequestService.sendVozovozRequest(startPoint, destination, volume, weight);
+            price = "нет результатов";
+            userSessionService.getLogisticPrice().add(price);
+            delivery = vozService.sendRequest(startPoint, destination, length.floatValue(), width.floatValue(),
+                    height.floatValue(), Float.valueOf(weight), volume);
+
+            if(delivery.get("response").get("basePrice") != null) {
+                price = delivery.get("response").get("basePrice").toString();
+                userSessionService.getLogisticPrice().set(0, price);
+            }
         } catch (JsonProcessingException j) {
             j.printStackTrace();
         } catch (Exception e) {
@@ -71,20 +91,20 @@ public class CalcController {
         }
 
         try {
-            delivery2 = postRequestService.sendDelLineRequest(startPoint, destination, length, width, heigth, volume, weight,
+            price2 = "нет результатов";
+            userSessionService.getLogisticPrice().add(price2);
+            delivery2 = dellineService.sendRequest(startPoint, destination, length, width, height, volume, weight,
                     oversizedWeight, oversizedVolume);
+            if(delivery2.get("data").get("price") != null) {
+                price2 = delivery2.get("data").get("price").toString();
+                userSessionService.getLogisticPrice().set(1, price2);
+            }
         } catch (JsonProcessingException j) {
             j.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
-            throw new CalcRequestException("Bad request 404!");
+            throw new DellineRequestException("Bad parameters!");
         }
-
-        //String price = delivery.get("response").get("basePrice").toString();
-        String price2 = delivery2.get("data").get("price").toString();
-
-        // Просто сохраняем состояние запроса пользователя
-        //taskService.saveToDto(taskDto);
 
         Task task = new Task();
         task.setCargoName(taskDto.getCargoName());
@@ -98,7 +118,7 @@ public class CalcController {
 
         model.addAttribute("cities", cities);
         model.addAttribute("user", userDto);
-        //model.addAttribute("price", price);
+        model.addAttribute("price", price);
         model.addAttribute("price2", price2);
         //toDo Сделать кнопку "Сохранить расчет"
 

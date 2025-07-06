@@ -3,7 +3,6 @@ package com.denidove.Logistics.controllers;
 import com.denidove.Logistics.dto.ResponseDto;
 import com.denidove.Logistics.dto.TaskDto;
 import com.denidove.Logistics.entities.Task;
-import com.denidove.Logistics.services.PostRequestService;
 import com.denidove.Logistics.services.TaskService;
 import com.denidove.Logistics.services.UserSessionService;
 
@@ -17,13 +16,10 @@ public class OrderController {
 
     private final TaskService taskService;
     private final UserSessionService userSessionService;
-    private final PostRequestService postRequestService;
 
-    public OrderController(TaskService taskService, UserSessionService userSessionService,
-                           PostRequestService postRequestService) {
+    public OrderController(TaskService taskService, UserSessionService userSessionService) {
         this.taskService = taskService;
         this.userSessionService = userSessionService;
-        this.postRequestService = postRequestService;
     }
 
     @PostMapping("/order")

@@ -26,6 +26,8 @@ public class UserSessionService {
 
     private List<TaskDto> taskDto = new ArrayList<>();
 
+    private List<String> logisticPrice = new ArrayList<>();
+
     public UserSessionService(UserRepository userRepository) {
         this.userRepository = userRepository;
 
