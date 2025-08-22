@@ -41,7 +41,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void register(User user, String siteUrl) {
+    public void register(User user) {
 
         Role userRole = roleRepository.getReferenceById(1);
         user.setRole(userRole);
@@ -51,7 +51,7 @@ public class UserServiceImpl implements UserService {
         user.setVerificationCode(randomCode);
 
         userRepository.save(user);
-        emailService.sendEmail(user.getEmail(), siteUrl, randomCode);
+        emailService.sendRegistrationEmail(user, randomCode);
     }
 
     public boolean verify(String code) {

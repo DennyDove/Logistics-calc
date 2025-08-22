@@ -32,7 +32,6 @@ public class TaskController {
     @GetMapping("/task-details")
     public String getTaskDetails(Model model, @RequestParam(value = "task", required = true) Long taskId) {
         SecurityUser user = userSessionService.getSecurityUser();
-
         Task task = taskService.findByUserIdAndTaskId(user.getId(), taskId).get();
 
         model.addAttribute("userInit", user.getInitials());
@@ -65,6 +64,7 @@ public class TaskController {
         List<Task> taskList = taskService.findAllByUserId(user.getId());
 
         model.addAttribute("userInit", user.getInitials());
+        model.addAttribute("userName", user.getUsername());
         model.addAttribute("taskList", taskList);
 
         return "user_orders.html";

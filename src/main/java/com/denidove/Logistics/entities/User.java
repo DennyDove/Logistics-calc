@@ -45,6 +45,9 @@ public class User {
 
     private boolean enabled;
 
+    @Column
+    private boolean twoauth; // в названии булева поля не следует использовать предлог "is" при использовании библиотеки Jackson, иначе не будет маппиться
+
     // Получаем первую букву имени пользователя
     public String getInitials() {
         return String.valueOf(name.charAt(0));

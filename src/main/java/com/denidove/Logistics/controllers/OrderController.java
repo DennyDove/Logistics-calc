@@ -1,14 +1,15 @@
 package com.denidove.Logistics.controllers;
 
-import com.denidove.Logistics.dto.ResponseDto;
 import com.denidove.Logistics.dto.TaskDto;
+import com.denidove.Logistics.email.EmailService;
 import com.denidove.Logistics.entities.Task;
+import com.denidove.Logistics.entities.User;
 import com.denidove.Logistics.services.TaskService;
 import com.denidove.Logistics.services.UserSessionService;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -16,45 +17,46 @@ public class OrderController {
 
     private final TaskService taskService;
     private final UserSessionService userSessionService;
+    private final EmailService emailService;
 
-    public OrderController(TaskService taskService, UserSessionService userSessionService) {
+    public OrderController(TaskService taskService, EmailService emailService, UserSessionService userSessionService) {
         this.taskService = taskService;
+        this.emailService = emailService;
         this.userSessionService = userSessionService;
     }
 
     @PostMapping("/order")
-    public ResponseEntity<?> saveOrder(@RequestBody TaskDto taskDto) {
-
+    public ResponseEntity<TaskDto> saveOrder(@RequestParam String key) {
         Task task = new Task();
+        User user = userSessionService.getSecurityUser().getUser();
+        var taskDto = userSessionService.getTaskDto().get(key);
         task.setCargoName(taskDto.getCargoName());
-        task.setStartPoint(taskDto.getStartPoint().getName());
-        task.setDestination(taskDto.getDestination().getName());
+        task.setStartPoint(taskDto.getStartPoint());
+        task.setDestination(taskDto.getDestination());
         task.setWeight(taskDto.getWeight());
+        task.setPrice(taskDto.getPrice());
 
         boolean authStatus = userSessionService.getAuthStatus();
 
-        task.setUser(userSessionService.getSecurityUser().getUser());
+        task.setUser(user);
         Long orderId = taskService.save(task);
+        taskDto.setId(orderId);
+
+        String msgTopic = "Заказ на сайте Logistics.pro";
+        String rawText = """
+                        <p>Добрый день, %s!</p>
+                        <p>Ваш заказ № %s оформлен в работу</p>
+                        <b> %s </b> руб., минимальный срок доставки: %s дн.
+                        <br>
+                        <p>С уважением,</p>
+                        Команда ООО "Логистик Плюс"
+                        """;
+        var msgText = String.format(rawText, user.getName(), orderId, taskDto.getPrice(), taskDto.getDays());
+
+        emailService.sendEmail(user, msgTopic, msgText);
+
         userSessionService.getTaskDto().clear();
-        //model.addAttribute("orderId", orderId);
-        //return "orderok.html";
 
-        ResponseDto responseDto = new ResponseDto();
-        responseDto.setId(orderId);
-
-        return ResponseEntity.ok().body(responseDto);
-
+        return ResponseEntity.ok().body(taskDto);
     }
-
-
-    /*
-    public ResponseEntity<?> addUser(@RequestBody User user) {
-        userService.save(user);
-        return ResponseEntity
-                .status(HttpStatus.FOUND)
-                .location(URI.create("http://localhost:8080/products"))
-                .build();
-    }
-    */
-
 }

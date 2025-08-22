@@ -1,77 +1,42 @@
 
-let startPoint = document.getElementById("startPoint");
-let destination = document.getElementById("destination");
-let cargoName = document.getElementById("cargoName");
-let weigth = document.getElementById("weigth");
+async function taskOrder(company) {
 
-let length = document.getElementById("length_input1");
-let width = document.getElementById("width_input1");
-let heigth = document.getElementById("heigth_input1");
-
-
-async function taskOrder() {
-
-  let obj = {
-    startPoint : startPoint.value,
-    destination : destination.value,
-    cargoName : cargoName.value,
-    weigth : weight.value
+  let data = {
+      key: company
   };
 
   let response = await fetch("/order",
-  // Если указать путь URI --> "https", то будет выскакивать ошибка Failed to load resource: net::ERR_SSL_PROTOCOL_ERROR
     {
-      method: 'POST',
-      headers: {"Content-Type" : "application/json"},
-      body: JSON.stringify(obj)
+    	method: 'POST',
+    	headers: {
+    	    //'Accept': 'application/json',
+    	    'Content-Type': 'application/x-www-form-urlencoded'
+    	},
+    	body: new URLSearchParams(data).toString()
     });
 
   if(response.ok) {
-    let responseObject = await response.json();
-    let output = document.getElementById("message");
-    //output.textContent = "Заказ №"+ responseObject.id + " оформлен";
-    //message.className = "show-message"; // появляется сообщение
-
-    window.location.replace("/order-ok?id=" + responseObject.id);
+    let orderObject = await response.json();
+    calcButton.style.visibility = "hidden";
+    results.className = "hide";
+    orderOk.className = "show";
+    //                                             + data.key + ".gif\" - получает имя файла логотипа по названию компании (например: "dellline".jpg)
+    orderOk_text.innerHTML = "<img src=\"images/" + data.key + ".jpg\" width=\"87\" height=\"23\"> <br> <span id=\"price_span\">" + orderObject.price + "</span> руб." + "  мин. срок доставки: " + orderObject.days +
+                             " дн. <br> Ваш заказ №" + orderObject.id + " оформлен в работу";
 
   } else {
-    alert("HTTP error: "+ responset.status);
+    alert("HTTP error: "+ response.status);
   }
 }
 
+orderButton1.addEventListener("click", function() {
+    taskOrder("vozovoz");
+});
 
-async function calc() {
-  let obj = {
-    startPoint : startPoint.value,
-    destination : destination.value,
-    cargoName : cargoName.value,
-    weigth : weigth.value,
-    length : length.value,
-    width : width.value,
-    heigth : heigth.value
-  };
+orderButton2.addEventListener("click", function() {
+    taskOrder("delline");
+});
 
-  let response = await fetch("/calc",
-  // Если указать путь URI --> "https", то будет выскакивать ошибка Failed to load resource: net::ERR_SSL_PROTOCOL_ERROR
-    {
-      method: 'POST',
-      headers: {"Content-Type" : "application/json"},
-      body: JSON.stringify(obj)
-    });
-
-    /*
-    if(response.ok) {
-      window.location.reload();
-
-    } else {
-      alert("HTTP error: "+ responset.status);
-    }
-    */
-  }
-
-
-orderButton.addEventListener("click", function() {
-    loading.className = "show";
-    calc();
-    //taskOrder();
+orderButton3.addEventListener("click", function() {
+    taskOrder("nordw");
 });

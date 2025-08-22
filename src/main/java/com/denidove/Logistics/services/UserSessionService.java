@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.SessionScope;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @Getter
@@ -24,9 +25,8 @@ public class UserSessionService {
 
     private final UserRepository userRepository;
 
-    private List<TaskDto> taskDto = new ArrayList<>();
-
-    private List<String> logisticPrice = new ArrayList<>();
+    private HashMap<String, TaskDto> taskDto = new HashMap<>();
+    private String siteUrl; // переменная для записи части адрессной строки пользователя (для формирования ссылки подтверждения регистрации)
 
     public UserSessionService(UserRepository userRepository) {
         this.userRepository = userRepository;

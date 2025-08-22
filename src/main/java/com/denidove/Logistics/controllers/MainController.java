@@ -29,16 +29,14 @@ public class MainController {
         // @ModelAttribute("task") в данном случае уже не работает т.к. из формы удалено th:object
         // Только th:object работает с @ModelAttribute("task")
 
-        List<City> cities = List.of(City.Moscow, City.Piter, City.Saratov, City.Vologda);
-
+        List<City> cities = List.of(City.Moscow, City.Piter, City.Saratov, City.Sochi);
 
         // Просто сохраняем состояние корзины неавторизованного пользователя
-        taskService.saveToDto(taskDto);
+        taskService.saveToDto("default", taskDto);
 
         model.addAttribute("user", userDto);
         model.addAttribute("task", taskDto); // сделать Optional ?
         model.addAttribute("cities", cities);
-        //return "index_auth.html";
         return "login_1.html";
     }
 

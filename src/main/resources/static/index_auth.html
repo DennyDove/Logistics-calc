@@ -36,63 +36,68 @@
 
         <div id="map" style="display: inline-block; vertical-align: top; margin-left: 30px; margin-top: 30px; width: 600px;	height: 400px;"> </div>
 
-        <div class="logictic_calc">
+        <div class="logistic_calc" style="height: 350px;" id="calcDiv">
           <h1>Рассчитать стоимость доставки</h1>
           <br>
-          <form th:action="@{/calc}" method="post" th:object="${task}" id="form">
+          <form id="form">
 
             <!--<h2>Пункт отправления</h2>-->
-            <label for="cityList">Пункт отправления:</label>
-            <select id="cityList" th:field="*{startPoint}">
-              <option th:each="c : ${cities}" th:value="${c}" th:text="${c.name}"></option>
-            </select>
+            <label for="startPoint">Пункт отправления:</label>
+            <input type="text" placeholder="Пункт отправления" id="startPoint" th:value="${task.startPoint}"></input>
             <br>
             <br>
             <!--<h2>Пункт назначения</h2>-->
-            <label for="cityList">Пункт назначения:</label>
-            <select id="cityList" th:field="*{destination}">
-              <option th:each="c : ${cities}" th:value="${c}" th:text="${c.name}"></option>
-            </select>
-              <br>
-              <br>
-              <input type="text" th:field="*{cargoName}" placeholder="Тип груза"> Тип груза</input>
-              <br>
-              <br>
-              <div class="dimensions">
-                <input type="text" th:field="*{length}" placeholder="Длина" value="0.1" id="qty_input1"> Д </input>
-                <input type="text" th:field="*{width}" placeholder="Ширина" value="0.2" id="qty_input1"> Ш </input>
-                <input type="text" th:field="*{heigth}" placeholder="Высота" value="0.3" id="qty_input1"> В </input>
-              </div>
-              Размеры, м
-              <br>
-              <input type="text" th:field="*{weight}" placeholder="Вес груза"> Вес груза, кг.</input>
-              <br>
-              <br>
-              <button type="submit">Рассчитать</button>
+            <label for="destination">Пункт назначения:</label>
+            <input type="text" placeholder="Пункт отправления" id="destination" th:value="${task.destination}"></input>
+            <br>
+            <br>
+            <input type="text" placeholder="Тип груза" id="cargoName" th:value="${task.cargoName}"> Тип груза</input>
+            <br>
+            <br>
+            <div class="dimensions">
+              <input type="text" placeholder="Длина" id="length" th:value="${task.length}"> Д </input>
+              <input type="text" placeholder="Ширина" id="width" th:value="${task.width}"> Ш </input>
+              <input type="text" placeholder="Высота" id="height" th:value="${task.height}"> В </input>
+            </div>
+            Размеры, м
+            <br>
+            <input type="text" placeholder="Вес груза" id="weight" th:value="${task.weight}" text="177"> Вес груза, кг.</input>
+            <br>
+            <br>
           </form>
-          <div th:if="${errorMessage}">
-            Упс... Неверные параметры запроса :( </div>
+          <button id="calcButton">Рассчитать</button>
+          <!-- <div th:if="${errorMessage}">
+            Упс... Неверные параметры запроса :( </div> -->
 
-          <div class="hide" id="loading" style="margin-top: 15px"> <img src="images/loading1.gif" width="87" height="23" border="0"> </div>
+          <div class="hide" id="orderOk"> <div id="orderOk_text"></div>
+            <br>
+            <div class="cart_text"> <a href="/"> Произвести новый расчет </a> </div>
+          </div>
+          <div id="results" class="show">
 
-          <div class="show" id="result1" style="margin-top: 12px" th:if="${price}">
-            <img src="images/vozovoz.jpg" width="87" height="23" border="0"> <div style="position: relative; bottom: 5px; display: inline-block"> [[${price}]] руб. </div>
-            <div th:if="${errorDelline}">
-              Ошибка запроса к сервису "Возовоз" </div>
+              <div class="hide" id="loading" style="margin-top: 15px"> <img src="images/loading1.gif" width="87" height="23" border="0"> </div>
+
+              <div class="hide" id="vozovoz" style="margin-top: 12px; margin-bottom: 17px;">
+                <img src="images/vozovoz.jpg" width="87" height="23" border="0"> <br>
+                <div class="normalText" id="result1" style="position: relative; top: 5px; bottom: 5px;"></div><button id="orderButton1" style="float: right;">Оформить заказ</button>
+              </div>
+              <div class="hide" id="delline" style="margin-top: 12px; margin-bottom: 17px;">
+                <img src="images/delline.jpg" width="87" height="23" border="0"> <br>
+                <div class="normalText" id="result2" style="position: relative; top: 5px; bottom: 5px;"></div><button id="orderButton2" style="float: right;">Оформить заказ</button>
+              </div>
+              <div class="hide" id="nordw" style="margin-top: 12px; margin-bottom: 17px;">
+                <img src="images/nordw.JPG" width="87" height="23" border="0"> <br>
+                <div class="normalText" id="result3" style="position: relative; top: 5px; bottom: 5px;"></div><button id="orderButton3" style="float: right;">Оформить заказ</button>
+              </div>
           </div>
-          <div class="show" id="result2" style="margin-top: 12px" th:if="${price2}">
-            <img src="images/delline.jpg" width="87" height="23" border="0"> <div style="position: relative; bottom: 5px; display: inline-block"> [[${price2}]] руб. </div>
-            <div th:if="${errorDelline}">
-              Ошибка запроса к сервису "Деловые линии" </div>
-            <div th:if="${incorrectDimensionDelline}">
-              "Деловые линии": некорректные размеры груза </div>
-          </div>
+
         </div>
       </div>
 
   </div>
   <!-- Блок JavaScript лучше всего подключать здесь - в конце <body>, т.к. иначе не считываются элементы DOM-->
   <!-- В шаблонизаторе Thymeleaf джава скрипт подключается особым образом. См. ниже  -->
-  <script th:src="@{js/script_animation.js}"></script>
+  <script th:src="@{js/script_request.js}"></script>
+  <script th:src="@{js/script_order.js}"></script>
 </body>
 </html>

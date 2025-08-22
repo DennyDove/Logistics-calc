@@ -53,16 +53,8 @@ public class TaskServiceImpl implements TaskService {
         return taskRepository.save(task).getId();
     }
 
-    //toDo
-    public void saveToDto(TaskDto taskDto) {
-        userSessionService.getTaskDto().add(taskDto);
-        /*
-        userSessionService.getTaskDto().setCargoName(task.getCargoName());
-        userSessionService.getTaskDto().setStartPoint(task.getStartPoint());
-        userSessionService.getTaskDto().setDestination(task.getDestination());
-        userSessionService.getTaskDto().setDistance(task.getDistance());
-        userSessionService.getTaskDto().setWeight(task.getWeight());
-        */
+    public void saveToDto(String company, TaskDto taskDto) {
+        userSessionService.getTaskDto().put(company, taskDto);
     }
 
 

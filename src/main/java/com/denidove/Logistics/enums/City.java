@@ -5,16 +5,16 @@ import lombok.Getter;
 @Getter
 
 public enum City {
-    Moscow("Москва", 0),
-    Piter("Санкт-Петербург", 5.5),
-    Vologda("Вологда", 4.0),
-    Saratov("Саратов", 7.7);
+    Moscow("Москва", 91),
+    Piter("Санкт-Петербург", 92),
+    Sochi("Сочи", 143),
+    Saratov("Саратов", 96);
 
     private String name;
-    private double coeff;
+    private Integer id;
 
-    City(String name, double coeff) {
+    City(String name, int id) {
         this.name = name;
-        this.coeff = coeff;
+        this.id = id;
     }
 }

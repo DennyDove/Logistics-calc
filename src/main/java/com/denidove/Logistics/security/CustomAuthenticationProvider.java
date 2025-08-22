@@ -65,12 +65,15 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
         }
         */
 
-        Boolean is2FAuth = false;
+        Boolean is2FAuth;
 
         String username = auth.getName();
         String password = auth.getCredentials().toString();
 
         UserDetails u = userDetailsService.loadUserByUsername(username);
+
+        // Загружаем статус 2-х факторной аутентификации: true / false
+        is2FAuth = ((SecurityUser) u).getUser().isTwoauth();
 
         String codeFromDb = ((SecurityUser) u).getUser().getVerificationCode();
 

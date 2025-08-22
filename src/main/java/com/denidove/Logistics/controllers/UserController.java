@@ -2,6 +2,7 @@ package com.denidove.Logistics.controllers;
 
 import com.denidove.Logistics.entities.User;
 import com.denidove.Logistics.services.UserService;
+import com.denidove.Logistics.services.UserSessionService;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,9 +15,11 @@ import java.io.UnsupportedEncodingException;
 public class UserController {
 
     private final UserService userService;
+    private final UserSessionService userSessionService;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, UserSessionService userSessionService) {
         this.userService = userService;
+        this.userSessionService = userSessionService;
     }
 
     /*
@@ -40,14 +43,16 @@ public class UserController {
     public void processRegister(@RequestBody User user, HttpServletRequest request)
             throws UnsupportedEncodingException, MessagingException {
         //userService.save(user);
-        userService.register(user, getSiteURL(request));
+
+        userSessionService.setSiteUrl(getSiteURL(request));
+        userService.register(user);
         //return "register_success";
     }
 
     private String getSiteURL(HttpServletRequest request) {
         String siteURL = request.getRequestURL().toString();    // "http://localhost:8080/adduser"
         String deleteStr = request.getServletPath().toString(); // "/adduser"
-        return siteURL.replace(deleteStr, "");      // результат: "http://localhost:8080/"
+        return siteURL.replace(deleteStr, "");       // результат: "http://localhost:8080/"
     }
 
 

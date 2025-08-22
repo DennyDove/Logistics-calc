@@ -34,17 +34,11 @@ public class ViewController {
         this.userSessionService = userSessionService;
     }
 
-    @GetMapping("/hello")
-    public String hello() {
-        //toDo создвть обработку исключений
-      return "hello.html";
-    }
-
     @GetMapping("/")
     public String home(Model model) {
         boolean loginStatus = userSessionService.getAuthStatus();
 
-        List<City> cities = List.of(City.Moscow, City.Piter, City.Saratov, City.Vologda);
+        List<City> cities = List.of(City.Moscow, City.Piter, City.Saratov, City.Sochi);
 
         TaskDto taskDto = new TaskDto();
         model.addAttribute("task", taskDto);
@@ -52,15 +46,10 @@ public class ViewController {
 
         // Очень важно добавить элемент "task" для работы с <form th:action="@{/order}" method="post" th:object="${task}">
         // Не получилось реализовать отображение сохраненного неавторизованным пользователем задания
-        /*
-        if(userSessionService.getTaskDto().isEmpty()) {
-            model.addAttribute("task", taskDto);
-            model.addAttribute("cities", cities);
-        } else {*/
 
         if(!userSessionService.getTaskDto().isEmpty()) {
-            taskDto = userSessionService.getTaskDto().getFirst();
-            model.addAttribute("task", taskDto); // сделать Optional ?
+            taskDto = userSessionService.getTaskDto().get("default");
+            model.addAttribute("task", taskDto);
             model.addAttribute("cities", cities);
         }
 
@@ -96,21 +85,19 @@ public class ViewController {
         //String loginServiceUrl = request.getContextPath();
         //postRequestService.sendLoginRequest(request, userDto);
 
-        Boolean is2FAuth = false;
-
         User user = userOpt.get();
 
-        if(is2FAuth) {
+        if(user.isTwoauth()) {
             String randomCode = RandomString.make(7);
             user.setVerificationCode(randomCode);
             userRepository.save(user);
-            emailService.sendEmail_2(user.getEmail(), randomCode);
+            emailService.sendLoginEmail(user, randomCode);
 
-            model.addAttribute("is2FAuth", is2FAuth);
+            model.addAttribute("is2FAuth", user.isTwoauth());
             model.addAttribute("user", userDto);
             return "login.html";
         } else {
-            model.addAttribute("is2FAuth", is2FAuth);
+            model.addAttribute("is2FAuth", user.isTwoauth());
             return "login.html";
         }
         //return "redirect:/";

@@ -11,6 +11,8 @@ import com.denidove.Logistics.exceptions.CredentialsException;
 import com.denidove.Logistics.exceptions.DellineRequestException;
 import com.denidove.Logistics.exceptions.IncorrectDimensionException;
 import com.denidove.Logistics.services.UserSessionService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -35,57 +37,14 @@ public class ExceptionControllerAdvice {
     }
 
     @ExceptionHandler(CalcRequestException.class)
-    public String handleCalcRequestException(CalcRequestException ex, Model model) {
-        SecurityUser user = userSessionService.getSecurityUser();
-        var userInit = user.getInitials();
-        int coinsInCart = 0;
-        List<City> cities = List.of(City.Moscow, City.Piter, City.Saratov, City.Vologda);
-
-        TaskDto taskDto = userSessionService.getTaskDto().getLast();
-        model.addAttribute("errorMessage", ex.getMessage());
-        model.addAttribute("price", userSessionService.getLogisticPrice().get(0));
-        model.addAttribute("price2", userSessionService.getLogisticPrice().get(1));
-        model.addAttribute("task", taskDto);
-        model.addAttribute("cities", cities);
-        model.addAttribute("userinit", userInit);
-        model.addAttribute("coinsInChart", coinsInCart);
-        return "index_auth.html";
+    public ResponseEntity<String> handleCalcRequestException(CalcRequestException ex) {
+        return new ResponseEntity<>("Ошибка 400. Некорректный запрос. " + ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(DellineRequestException.class)
-    public String handleDellineRequestException(DellineRequestException ex, Model model) {
-        SecurityUser user = userSessionService.getSecurityUser();
-        var userInit = user.getInitials();
-        int coinsInCart = 0;
-        List<City> cities = List.of(City.Moscow, City.Piter, City.Saratov, City.Vologda);
-
-        TaskDto taskDto = userSessionService.getTaskDto().getLast();
-        model.addAttribute("errorDelline", ex.getMessage());
-        model.addAttribute("price", userSessionService.getLogisticPrice().get(0));
-        model.addAttribute("price2", userSessionService.getLogisticPrice().get(1));
-        model.addAttribute("task", taskDto);
-        model.addAttribute("cities", cities);
-        model.addAttribute("userinit", userInit);
-        model.addAttribute("coinsInChart", coinsInCart);
-        return "index_auth.html";
-    }
 
     @ExceptionHandler(IncorrectDimensionException.class)
-    public String handleIncorrectDimensionException(IncorrectDimensionException ex, Model model) {
-        SecurityUser user = userSessionService.getSecurityUser();
-        var userInit = user.getInitials();
-        int coinsInCart = 0;
-        List<City> cities = List.of(City.Moscow, City.Piter, City.Saratov, City.Vologda);
-
-        TaskDto taskDto = userSessionService.getTaskDto().getLast();
-        model.addAttribute("incorrectDimensionDelline", ex.getMessage());
-        model.addAttribute("price", userSessionService.getLogisticPrice().get(0));
-        model.addAttribute("price2", userSessionService.getLogisticPrice().get(1));
-        model.addAttribute("task", taskDto);
-        model.addAttribute("cities", cities);
-        model.addAttribute("userinit", userInit);
-        model.addAttribute("coinsInChart", coinsInCart);
-        return "index_auth.html";
+    public ResponseEntity<String> handleIncorrectDimensionException(IncorrectDimensionException ex) {
+        return new ResponseEntity<>("Ошибка 400. Некорректный запрос. " + ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     /* toDo данный обработчик исключений работает только с контроллерами, а здесь не контроллер, а AuthenticationProvider,

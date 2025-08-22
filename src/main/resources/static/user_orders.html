@@ -26,9 +26,10 @@
           <div class="itemAdded" th:each="task: ${taskList}">
             <div class="table">
                <div class="column">
-                   <div class="cart_text"> <a th:href="@{'/task-details'(task=${task.id})}"> Заказ номер [[ ${task.id} ]] </a> </div>
-                   <div class="cart_text"> [[ ${task.timeDate} ]] </div>
-                   <div class="cart_text">  Статус: [[ ${task.status.title} ]] </div>
+                   <div class="cart_text"> <a th:href="@{'/task-details'(task=${task.id})}">
+                       <span class="normal_text">Заказ номер [[ ${task.id} ]]</span> </a> </div>
+                   <div class="cart_text">[[ ${task.timeDate} ]]</div>
+                   <div class="cart_text">Статус: [[ ${task.status.title} ]]</div>
                </div>
             </div>
            </div>

@@ -7,6 +7,7 @@ let login = document.getElementById("login");
 let age = document.getElementById("age");
 let email = document.getElementById("email");
 let password = document.getElementById("password");
+let twoauth = document.getElementById("twoFAuth");
 let confirmPassword = document.getElementById("confirmPassword");
 let errorMessage = document.getElementById("errorMessage");
 
@@ -16,7 +17,6 @@ let regButton = document.getElementById("regButton");
 let correctPassword = false;
 let correctAge = false;
 let correctEmail = false;
-
 let emailPattern = new RegExp("[a-zA-Z0-9.-~_]+@[a-zA-Z0-9.]+[\.]");  //+([\w-]+\.)+[a-zA-Z0-9]");   //+[\w]");
                                   // почему-то здесь не работает /w
 
@@ -63,12 +63,19 @@ function checkEmail() {
 // Регистрация нового пользователя
 async function createUser() {
 
+  /*
+  let checkboxStatus = false;
+  if(twoauth.checked === true) {
+    checkboxStatus = true;
+  }*/
+
   let obj = {
     name : name.value,
     login : login.value,
     email : email.value,
     age : age.value,
-    password : password.value
+    password : password.value,
+    twoauth : twoauth.checked
   };
 
   let request = await fetch("/adduser",
@@ -80,8 +87,9 @@ async function createUser() {
     });
 
   if(request.ok) {
-    alert("User created!");
-    window.location.replace("/");
+    //alert("User created!");
+    //window.location.replace("/");
+    confirmText.className = "show";
 
   } else {
     alert("HTTP error: "+ request.status);

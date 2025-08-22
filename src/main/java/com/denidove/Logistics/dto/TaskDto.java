@@ -13,26 +13,30 @@ import java.nio.DoubleBuffer;
 @NoArgsConstructor
 public class TaskDto {
 
+    private Long id;
     private String cargoName;
-    private City startPoint;
-    private City destination;
+    private String startPoint;
+    private String destination;
     private Double distance;
     private Double length;
     private Double width;
-    private Double heigth;
+    private Double height;
     private Double weight;
-
+    private Double price;
+    private Integer days;
     private TaskStatus status;
 
     private static Long idIncrement = 0L; // данное статическое поле сохраняет свое значение внезависимости от сессии
 
-    public TaskDto(String cargoName, City startPoint, City destination,
-                   Double distance, Double weight, TaskStatus status) {
+    public TaskDto(String cargoName, String startPoint, String destination,
+                   Double distance, Double weight, Double price, Integer days, TaskStatus status) {
         this.cargoName = cargoName;
         this.startPoint = startPoint;
         this.destination = destination;
         this.distance = distance;
         this.weight = weight;
+        this.price = price;
+        this.days = days;
         this.status = status;
     }
 }
