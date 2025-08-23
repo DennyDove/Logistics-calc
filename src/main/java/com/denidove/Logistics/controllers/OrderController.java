@@ -44,6 +44,7 @@ public class OrderController {
         Long orderId = taskService.save(task);
         taskDto.setId(orderId);
 
+        /*
         String msgTopic = "Заказ на сайте Logistics.pro";
         String rawText = """
                         <p>Добрый день, %s!</p>
@@ -53,9 +54,9 @@ public class OrderController {
                         <p>С уважением,</p>
                         Команда ООО "Логистик Плюс"
                         """;
-        var msgText = String.format(rawText, user.getName(), orderId, taskDto.getPrice(), taskDto.getDays());
+        var msgText = String.format(rawText, user.getName(), orderId, taskDto.getPrice(), taskDto.getDays());*/
 
-        emailService.sendOrderEmail(user, msgTopic, msgText);
+        emailService.sendOrderEmail(taskDto, user); //, msgTopic, msgText);
 
         userSessionService.getTaskDto().clear();
 
