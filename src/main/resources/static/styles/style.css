@@ -129,11 +129,11 @@ width: expression(  /*задаем минимальную ширину маке�
 /* Стили виртуальной витрины */
 #content_container {
 	margin-top: 10px;
-  margin-right: 203px;
+  /*margin-right: 203px; */
 	margin-bottom: 77px;
 	width: 100%;
 	position:  relative;
-	/* background-color: #99CCCC; */
+	/*background-color: #99CCCC;*/
 	/* background-image:  url(images/coins1.jpg);
 	background-repeat: repeat-x;
 
@@ -337,13 +337,12 @@ div.item_price {
 div.itemAdded {
 	display: grid;
 	vertical-align: top;
-	margin-left:100px;
-    margin-top: 30px;
+	margin-left:40px;
+  margin-top: 30px;
 	margin-bottom: 30px;
 	padding-bottom: 17px;
-    height: 77px;
-	width: 100%;
-	min-width: 1300px;
+  height: 77px;
+	width: auto;
 	/* position: relative; */
 	/*top: 23px;
 	left: 23px;*/
@@ -370,33 +369,50 @@ div.cart_item {
 	color: #FF4500;
 }
 
-div.task_text {
+div.task_logo {
 	display: inline-grid;
 	position: relative;
-	top: 17px;
+	top: 33px;
 	margin: 0px;
 	height: 40px;
 	width: 133px;
 	font-size: 15px;
-    font-style: normal;
-    font-weight: normal;
-    color: #0057ad;
-    text-align: center;
+  font-style: normal;
+  font-weight: normal;
+  color: #0057ad;
+  text-align: center;
+	/*background-color: #FF1493;*/
+}
+
+div.task_text {
+	display: inline-grid;
+	position: relative;
+	top: 27px;
+	margin: 0px;
+	height: 40px;
+	width: 133px;
+	font-size: 15px;
+  font-style: normal;
+  font-weight: normal;
+  color: #0057ad;
+  text-align: center;
+	/*background-color: #FF1493;*/
 }
 
 div.cart_text {
 	display: inline-grid;
 	position: relative;
-	margin: 10px;
+	top: 27px;
+	margin: 0px;
 	height: 40px;
 	width: 223px;
-	padding-bottom: 0px;
+	/*padding-bottom: 0px; 223*/
 	font-size: 15px;
-    font-style: normal;
-    font-weight: normal;
-    color: #0057ad;
-    text-align: center;
-  /*background-color: #FF1493; */
+  font-style: normal;
+  font-weight: normal;
+  color: #0057ad;
+  text-align: center;
+  /*background-color: #FF1493;*/
 }
 
 div.cart_drop_button {

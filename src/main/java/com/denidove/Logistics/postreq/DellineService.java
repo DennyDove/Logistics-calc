@@ -68,6 +68,8 @@ public class DellineService {
             var deliveryDate = orderDates.get("derivalFromOspReceiver").toString();
             var days = CalendarUtils.getDays(startDate, deliveryDate); // определяем срок доставки
             var price = result.get("price");
+            taskDto.setCompanyName("Деловые линии");
+            taskDto.setCompanyLogo("delline.jpg");
             taskDto.setPrice(price);
             taskDto.setDays(days);
 

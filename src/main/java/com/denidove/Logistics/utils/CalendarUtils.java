@@ -1,6 +1,7 @@
 package com.denidove.Logistics.utils;
 
 import java.time.LocalDate;
+import java.time.Period;
 import java.time.format.DateTimeFormatter;
 
 public class CalendarUtils {
@@ -30,7 +31,9 @@ public class CalendarUtils {
     public static int getDays(String startDate, String finishDate) {
         LocalDate date1 = LocalDate.parse(startDate);
         LocalDate date2 = LocalDate.parse(finishDate);
-        return date2.getDayOfMonth() - date1.getDayOfMonth();
+
+        Period period = Period.between(date1, date2);
+        return period.getDays();
     }
 
 }

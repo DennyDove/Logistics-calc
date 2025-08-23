@@ -23,7 +23,7 @@ public class EmailService {
         this.userSessionService = userSessionService;
     }
 
-    public void sendEmail(User user, String msgTopic, String msgText) {
+    public void sendOrderEmail(User user, String msgTopic, String msgText) {
         Properties props = new Properties();
         Properties conf = new Properties();
 
@@ -44,7 +44,7 @@ public class EmailService {
         session.setDebug(true); // для вывода в консоль процесса отправки письма
 
         try {
-            Message message = buildMsg(session, props.getProperty("mail.smtp.username"),
+            Message message = buildOrderMsg(session, props.getProperty("mail.smtp.username"),
                     user, msgTopic, msgText);
             Transport.send(message, props.getProperty("mail.smtp.username"),
                     props.getProperty("mail.smtp.password"));
@@ -134,7 +134,7 @@ public class EmailService {
         return configuration;
     }
 
-    public Message buildMsg(Session session, String sender, User user, String msgTopic, String msgText) throws MessagingException, IOException {
+    public Message buildOrderMsg(Session session, String sender, User user, String msgTopic, String msgText) throws MessagingException, IOException {
         Message message = new MimeMessage(session);
 
         message.setFrom(new InternetAddress(sender));

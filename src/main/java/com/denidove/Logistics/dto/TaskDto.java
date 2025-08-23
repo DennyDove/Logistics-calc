@@ -14,6 +14,8 @@ import java.nio.DoubleBuffer;
 public class TaskDto {
 
     private Long id;
+    private String companyName;
+    private String companyLogo;
     private String cargoName;
     private String startPoint;
     private String destination;
@@ -28,8 +30,9 @@ public class TaskDto {
 
     private static Long idIncrement = 0L; // данное статическое поле сохраняет свое значение внезависимости от сессии
 
-    public TaskDto(String cargoName, String startPoint, String destination,
+    public TaskDto(String companyName, String cargoName, String startPoint, String destination,
                    Double distance, Double weight, Double price, Integer days, TaskStatus status) {
+        this.companyName = companyName;
         this.cargoName = cargoName;
         this.startPoint = startPoint;
         this.destination = destination;

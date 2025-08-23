@@ -30,6 +30,8 @@ public class OrderController {
         Task task = new Task();
         User user = userSessionService.getSecurityUser().getUser();
         var taskDto = userSessionService.getTaskDto().get(key);
+        task.setCompanyName(taskDto.getCompanyName());
+        task.setCompanyLogo(taskDto.getCompanyLogo());
         task.setCargoName(taskDto.getCargoName());
         task.setStartPoint(taskDto.getStartPoint());
         task.setDestination(taskDto.getDestination());
@@ -53,7 +55,7 @@ public class OrderController {
                         """;
         var msgText = String.format(rawText, user.getName(), orderId, taskDto.getPrice(), taskDto.getDays());
 
-        emailService.sendEmail(user, msgTopic, msgText);
+        emailService.sendOrderEmail(user, msgTopic, msgText);
 
         userSessionService.getTaskDto().clear();
 

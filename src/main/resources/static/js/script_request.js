@@ -1,6 +1,7 @@
 
 let calcDiv = document.getElementById("calcDiv");
 
+let cargoName = document.getElementById("cargoName");
 let startPoint = document.getElementById("startPoint");
 let destination = document.getElementById("destination");
 let length = document.getElementById("length");
@@ -27,6 +28,7 @@ async function vozCalc() {
 
   //result1.className = "hide";
   let obj = {
+    cargoName : cargoName.value,
     startPoint : startPoint.value,
     destination : destination.value,
     length : length.value,
@@ -90,6 +92,7 @@ async function vozCalc() {
 async function dellineCalc() {
 
   let obj = {
+    cargoName : cargoName.value,
     startPoint : startPoint.value,
     destination : destination.value,
     length : length.value,
@@ -130,6 +133,7 @@ async function dellineCalc() {
 async function nordwCalc() {
 
   let obj = {
+    cargoName : cargoName.value,
     startPoint : startPoint.value,
     destination : destination.value,
     length : length.value,

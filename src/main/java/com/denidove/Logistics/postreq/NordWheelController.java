@@ -74,6 +74,9 @@ public class NordWheelController {
             if(delivery.getData().getTotal() != null) {
                 Double price = delivery.getData().getTotal();
                 Integer days = delivery.getData().getDays();
+                //toDo перенести это в сервисный класс
+                taskDto.setCompanyName("Nord Wheel");
+                taskDto.setCompanyLogo("nordw.jpg");
                 taskDto.setPrice(price);
                 taskDto.setDays(days);
 

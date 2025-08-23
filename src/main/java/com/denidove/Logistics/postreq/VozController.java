@@ -50,6 +50,9 @@ public class VozController {
             if(delivery.get("response") != null) {
                 Integer price = (Integer) delivery.get("response").get("basePrice");
                 Integer days = ((LinkedHashMap<String, Integer>) delivery.get("response").get("deliveryTime")).get("from");
+                //toDo перенести это в сервисный класс
+                taskDto.setCompanyName("Возавоз");
+                taskDto.setCompanyLogo("vozovoz.jpg");
                 taskDto.setDays(days);
                 taskDto.setPrice(price.doubleValue());
 

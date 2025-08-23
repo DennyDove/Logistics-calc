@@ -21,6 +21,12 @@ public class Task {
     private Long id;
 
     @Column
+    private String companyName;
+
+    @Column
+    private String companyLogo;
+
+    @Column
     private String cargoName;
 
     @Column
