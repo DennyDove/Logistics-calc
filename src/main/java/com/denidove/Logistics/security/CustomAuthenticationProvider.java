@@ -49,22 +49,6 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
                 = ((CustomWebAuthenticationDetails) auth.getDetails())
                 .getVerificationCode();
 
-        /*
-        SecurityUser securityUser = (SecurityUser) userDetailsService.loadUserByUsername(auth.getName()); //new SecurityUser(userService.findByLogin(auth.getName()).get());  // findByLogin
-        if ((securityUser == null)) {
-            throw new BadCredentialsException("Invalid username or password");
-        }
-        */
-
-        /*
-        if (user.isUsing2FA()) {
-            Totp totp = new Totp(user.getSecret());
-            if (!isValidLong(verificationCode) || !totp.verify(verificationCode)) {
-                throw new BadCredentialsException("Invalid verfication code");
-            }
-        }
-        */
-
         Boolean is2FAuth;
 
         String username = auth.getName();
