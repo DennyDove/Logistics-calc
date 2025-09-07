@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html" charset="UTF-8">
+    <title>Main page</title>
+</head>
+<body>
+<style>
+    div.container_email {
+        padding: 23px;
+        height: 100%%; /* Двойной процент, чтобы избежать исключения String.format - Exception in thread "main" java.util.UnknownFormatConversionException: Conversion = ';' */
+        width: 100%%;
+        color: #b8b2ab;   /*c4beb7;*/
+        background-color: #f5f5f5;
+    }
+
+    div.user_menu {
+      margin: auto;
+      width: 177px;
+      /*display: inline-block;
+      position: relative;
+      left: 33px;?*/
+      font-size: 14px;
+      font-family: sans-serif;
+      /*background-color: #ddeeff;
+      color: #0057ad;*/
+    }
+
+    div.message {
+        vertical-align: top;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 30px;
+        padding: 23px;
+        height: 350px;
+        width: 433px;
+        border: thin solid;
+        border-color: #ffffff;
+        border-radius: 13px;
+
+        font-size: 14px;
+        font-family: sans-serif;
+        color: #0057ad;
+        background-color: #ffffff; /*ddeeff;*/
+    }
+
+    div.line1 {
+      position: relative;
+      height: 4px;
+      width: 100%%; /* Двойной процент, чтобы избежать исключения String.format - Exception in thread "main" java.util.UnknownFormatConversionException: Conversion = ';' */
+      background-color: #f5f5f5;
+    }
+
+    div.footer {
+        vertical-align: bottom;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 23px;
+        height: 123px;
+        width: 433px;
+
+        font-size: 14px;
+        font-family: sans-serif;
+        color: #0057ad;
+        background-color: #ffffff; /*ddeeff;*/
+    }
+
+    div.button {
+      margin: auto;
+      width: 177px;
+      height: 45px;
+      /*display: inline-block;
+      position: relative;
+      left: 33px;?*/
+      line-height: 45px;
+      border: thin solid;
+      border-color: #ffffff;
+      border-radius: 13px;
+
+      text-align: center;
+
+      background-color: #00bfff;
+      color: #0057ad;
+    }
+
+
+    a.button {
+      font-size: 16px;
+      font-style: normal;
+      font-family: sans-serif;
+      text-decoration: none;
+    }
+
+</style>
+
+    <div class="container_email">
+       <div class="user_menu"> <h2> LOGISTICS PRO </h2> </div>
+       <div class="message">
+           <br>
+           <h2>Добро пожаловать в LOGISTICS PRO!</h2>
+           <br>
+           <p style="font-size: 16px;">Для подтверждения регистрации пройдите по ссылке:</p>
+           <a class="button" href="%s"><div class="button">Подтвердить email</div></a>
+           <br>
+           <div class="line1"></div>
+           <div class="footer">
+             <p>С уважением,</p>
+             Команда ООО "Логистик Про" <br>
+             тел.: +7(916) 007-42-35
+             <div><img src="cid:logo" alt="Logo" width="150" height="55"></div>
+           </div>
+
+           <br>
+       </div>
+   </div>
+</body>
+</html>

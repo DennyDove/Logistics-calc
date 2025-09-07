@@ -21,6 +21,7 @@
   <div class="line1"></div>
 
     <div id="content_container">
+
         <div class="user_menu"> <h2>Заказы пользователя [[ ${userName} ]]</h2> </div>
 
           <div class="itemAdded" th:each="task: ${taskList}">
@@ -37,10 +38,19 @@
                </div>
             </div>
            </div>
-
       </div>
-
   </div>
+
+  <div id="footer">
+    <div class="rights_text_holder">
+      <p class="shrimping_height"> 2025 &#169; Все права защищены.</p>
+      <p class="shrimping_height">
+        <span id="trade_mark"><a href="site_mainpage.htm">
+        OOO &#171;Logistics Pro&#187;</a></span>.</p>
+      <p class="shrimping_height">Полное или частичное использование материалов данного сайта возможно только с письменного разрешения администрации сайта.</p>
+    </div>
+  </div>
+  
 </div>
 
 <!-- В шаблонизаторе Thymeleaf джава скрипт подключается особым образом. См. ниже  -->

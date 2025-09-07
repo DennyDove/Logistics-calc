@@ -8,12 +8,13 @@
     <link href="styles/style.css" th:href="@{styles/style.css}" rel="stylesheet" type="text/css"/>
 </head>
 <body>
-<h1>Новая логистика</h1>
-<h3></h3>
 <!-- Основной контейнер, включающий остальные DIV-->
 <div id="container">
 
-  <div class="block_holder1"></div>
+  <div class="header">
+    <div class="block_logo"> <a href="/"> <img src="images/logo.jpg" width="477" height="153" border="0"> </a> </div>
+  </div>
+  <div class="line1"></div>
 
   <br /><br />
   <div id="regform_holder">
@@ -33,10 +34,9 @@
       <div class="hide-error" id="errorPassword">Пароли не совпадают</div>
       <p><button id="regButton">Зарегистрироваться</button></p>
     </div>
-    <div class="hide" id="confirmText" style="font-size: 14px; font-weight: normal; color: #0057ad;"> <p>На ваш адресс электронной почты выслано письмо со ссылкой для подтверждения учетной записи.</p>
-          <p>Пройдите по данной ссылке для завершения регистрации.</p>
+    <div class="hide" id="confirmText" style="font-size: 14px; font-weight: bolder; color: #0057ad; text-align: center;">
+      На ваш адресс электронной почты выслано письмо со ссылкой для подтверждения учетной записи.
     </div>
-
   </div>
 
   <!--
@@ -44,6 +44,16 @@
     <textarea id="responseTextArea" placeholder="Response text 1 - For development issues"></textarea>
   </div>
   -->
+
+  <div id="footer">
+    <div class="rights_text_holder">
+      <p class="shrimping_height"> 2025 &#169; Все права защищены.</p>
+      <p class="shrimping_height">
+        <span id="trade_mark"><a href="site_mainpage.htm">
+        OOO &#171;Logistics Pro&#187;</a></span>.</p>
+      <p class="shrimping_height">Полное или частичное использование материалов данного сайта возможно только с письменного разрешения администрации сайта.</p>
+    </div>
+  </div>
 
 </div>
 <!-- Блок JavaScript лучше всего подключать здесь - в конце <body>, т.к. иначе не считываются элементы DOM-->

@@ -29,7 +29,7 @@ public class MainController {
         // @ModelAttribute("task") в данном случае уже не работает т.к. из формы удалено th:object
         // Только th:object работает с @ModelAttribute("task")
 
-        List<City> cities = List.of(City.Moscow, City.Piter, City.Saratov, City.Sochi);
+        List<City> cities = List.of(City.values());
 
         // Просто сохраняем состояние корзины неавторизованного пользователя
         taskService.saveToDto("default", taskDto);

@@ -2,6 +2,7 @@ package com.denidove.Logistics.controllers;
 
 import com.denidove.Logistics.dto.TaskDto;
 import com.denidove.Logistics.email.EmailService;
+import com.denidove.Logistics.email.SimpleMailService;
 import com.denidove.Logistics.entities.Task;
 import com.denidove.Logistics.entities.User;
 import com.denidove.Logistics.services.TaskService;
@@ -18,10 +19,13 @@ public class OrderController {
     private final TaskService taskService;
     private final UserSessionService userSessionService;
     private final EmailService emailService;
+    private final SimpleMailService simpleMailService;
 
-    public OrderController(TaskService taskService, EmailService emailService, UserSessionService userSessionService) {
+    public OrderController(TaskService taskService, EmailService emailService,
+                           SimpleMailService simpleMailService, UserSessionService userSessionService) {
         this.taskService = taskService;
         this.emailService = emailService;
+        this.simpleMailService = simpleMailService;
         this.userSessionService = userSessionService;
     }
 
@@ -56,7 +60,8 @@ public class OrderController {
                         """;
         var msgText = String.format(rawText, user.getName(), orderId, taskDto.getPrice(), taskDto.getDays());*/
 
-        emailService.sendOrderEmail(taskDto, user); //, msgTopic, msgText);
+        //emailService.sendOrderEmail(taskDto, user);
+        simpleMailService.sendOrderEmail(taskDto, user);
 
         userSessionService.getTaskDto().clear();
 

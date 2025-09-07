@@ -91,6 +91,7 @@ public class ViewController {
             String randomCode = RandomString.make(7);
             user.setVerificationCode(randomCode);
             userRepository.save(user);
+            //toDo SimpleMail
             emailService.sendLoginEmail(user, randomCode);
 
             model.addAttribute("is2FAuth", user.isTwoauth());

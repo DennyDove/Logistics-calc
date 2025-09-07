@@ -1,6 +1,7 @@
 package com.denidove.Logistics.services.impl;
 
 import com.denidove.Logistics.email.EmailService;
+import com.denidove.Logistics.email.SimpleMailService;
 import com.denidove.Logistics.entities.Role;
 import com.denidove.Logistics.entities.User;
 import com.denidove.Logistics.repositories.RoleRepository;
@@ -19,13 +20,16 @@ public class UserServiceImpl implements UserService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
+    private final SimpleMailService simpleMailService;
 
     public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository,
-                           PasswordEncoder passwordEncoder, EmailService emailService) {
+                           PasswordEncoder passwordEncoder, EmailService emailService,
+                           SimpleMailService simpleMailService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.emailService = emailService;
+        this.simpleMailService = simpleMailService;
     }
 
     @Override
@@ -51,7 +55,9 @@ public class UserServiceImpl implements UserService {
         user.setVerificationCode(randomCode);
 
         userRepository.save(user);
-        emailService.sendRegistrationEmail(user, randomCode);
+
+        simpleMailService.sendRegEmail(user, randomCode);
+        //emailService.sendRegistrationEmail(user, randomCode);
     }
 
     public boolean verify(String code) {

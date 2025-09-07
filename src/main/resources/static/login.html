@@ -22,7 +22,7 @@
       <div id="content_container">
 
         <br /><br />
-        <div id="regform_holder">
+        <div id="login_holder">
           <div class="regform">
             <div th:if="${param.error}">
         			Неверный пароль или имя пользователя.</div>
@@ -37,21 +37,27 @@
                 <p><input type='text' name="code" placeholder="Код подтверждения"/></p>
                 <p><input type="submit" value=" Войти " /></p>
               </form>
+            </div>
+            <div th:if="${is2FAuth == false}">
+              <form th:action="@{/login}" method="post">
+                <h1> Вход в систему </h1>
+                 <p><input type="hidden" name="username" placeholder="Ваш логин" id="login" th:value="${user.username}"></p>
+                 <p><input type="hidden" name="password" placeholder="Ваш Пароль" id="password" th:value="${user.password}"></p>
+                 <P> Продолжить без 2-х факторной аутентификации </p>
+                <p><input type="submit" value=" Войти " /></p>
+              </form>
+            </div>
           </div>
-          <div th:if="${is2FAuth == false}">
-            <form th:action="@{/login}" method="post">
-              <h1> Вход в систему </h1>
-               <p><input type="hidden" name="username" placeholder="Ваш логин" id="login" th:value="${user.username}"></p>
-               <p><input type="hidden" name="password" placeholder="Ваш Пароль" id="password" th:value="${user.password}"></p>
-               <P> Продолжить без 2-х факторной аутентификации </p>
-              <p><input type="submit" value=" Войти " /></p>
-            </form>
-        </div>
+      </div>
 
-            <!-- <p><button id="loginButton"> Войти </button></p> -->
-          </div>
+      <div id="footer">
+        <div class="rights_text_holder">
+          <p class="shrimping_height"> 2025 &#169; Все права защищены.</p>
+          <p class="shrimping_height">
+            <span id="trade_mark"><a href="site_mainpage.htm">
+            OOO &#171;Logistics Pro&#187;</a></span>.</p>
+          <p class="shrimping_height">Полное или частичное использование материалов данного сайта возможно только с письменного разрешения администрации сайта.</p>
         </div>
-
       </div>
 
   </div>

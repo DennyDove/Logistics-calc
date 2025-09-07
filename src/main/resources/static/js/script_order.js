@@ -22,7 +22,7 @@ async function taskOrder(company) {
     orderOk.className = "show";
     //                                             + data.key + ".gif\" - получает имя файла логотипа по названию компании (например: "dellline".jpg)
     orderOk_text.innerHTML = "<img src=\"images/" + data.key + ".jpg\" width=\"87\" height=\"23\"> <br> <span id=\"price_span\">" + orderObject.price + "</span> руб." + "  мин. срок доставки: " + orderObject.days +
-                             " дн. <br> Ваш заказ №" + orderObject.id + " оформлен в работу";
+                             " дн. <br> <br> Ваш заказ №" + orderObject.id + " оформлен в работу";
 
   } else {
     alert("HTTP error: "+ response.status);

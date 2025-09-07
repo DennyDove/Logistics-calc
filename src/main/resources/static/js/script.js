@@ -90,7 +90,8 @@ async function createUser() {
     //alert("User created!");
     //window.location.replace("/");
     confirmText.className = "show";
-
+    regform_holder.style.height = "390px";
+    regButton.style.visibility = "hidden";
   } else {
     alert("HTTP error: "+ request.status);
   }
