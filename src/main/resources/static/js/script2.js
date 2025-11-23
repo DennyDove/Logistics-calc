@@ -36,14 +36,16 @@ async function newPassword() {
   // Если указать путь URI --> "https", то будет выскакивать ошибка Failed to load resource: net::ERR_SSL_PROTOCOL_ERROR
     {
       method: 'POST',
-      headers: {"Content-Type" : "application/json"},
+      headers: {'Content-Type' : 'application/json',
+                'Accept': 'application/json'  // помогает серверу понять, что это AJAX (чтобы корректно обрабатывалось в CustomAuthenticationEntryPoint
+      },
       body: JSON.stringify(obj)
     });
 
   if(request.ok) {
     confirmText.className = "show";
     regform_holder.style.height = "390px";
-    regButton.style.visibility = "hidden";
+    saveButton.style.visibility = "hidden";
     window.location.href = "/";
   }
 

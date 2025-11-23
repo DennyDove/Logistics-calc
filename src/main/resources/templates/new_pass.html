@@ -50,6 +50,6 @@
 </div>
 <!-- Блок JavaScript лучше всего подключать здесь - в конце <body>, т.к. иначе не считываются элементы DOM-->
 <!-- В шаблонизаторе Thymeleaf джава скрипт подключается особым образом. См. ниже  -->
-<script src="js/script2.js"></script>
+<script th:src="@{js/script2.js}"></script>
 </body>
 </html>
