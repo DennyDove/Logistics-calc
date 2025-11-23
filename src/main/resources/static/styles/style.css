@@ -208,6 +208,10 @@ div.profile {
 	bottom: 10px;
 }
 
+div.profile a {
+	text-decoration: none;
+}
+
 /* блок для корректного отображения кружочка с буквой имени пользователя*/
 div.profile_user {
 	display: inline-block;
@@ -491,7 +495,7 @@ div.cart_drop_button {
 	margin-top: 23px;
 	/*margin-bottom: 0px;*/
   padding: 23px;
-  height: 333px;
+  height: 377px;
 	width: 433px;
 	border-radius: 17px;
 	position:  relative;

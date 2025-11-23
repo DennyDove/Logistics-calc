@@ -53,10 +53,9 @@ public class TaskServiceImpl implements TaskService {
         return taskRepository.save(task).getId();
     }
 
-    public void saveToDto(String company, TaskDto taskDto) {
-        userSessionService.getTaskDto().put(company, taskDto);
+    public void saveToDto(String login, TaskDto taskDto) {
+        //userSessionService.saveTaskDto(login, taskDto);
     }
-
 
     public void updateTaskAdmin(Task task) {
         taskRepository.save(task);

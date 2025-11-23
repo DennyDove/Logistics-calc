@@ -19,7 +19,7 @@ public interface TaskService {
 
 
     public Long save(Task task);
-    public void saveToDto(String key, TaskDto task);
+    public void saveToDto(String login, TaskDto task);
 
     public void updateTaskAdmin(Task task);
 

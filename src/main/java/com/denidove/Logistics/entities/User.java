@@ -1,5 +1,6 @@
 package com.denidove.Logistics.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,6 +31,9 @@ public class User {
     @Column (nullable = false)
     private String email;
 
+    @Column //(nullable = false)
+    private String phone;
+
     @Column(nullable = false)
     private String password;
 
@@ -38,6 +42,7 @@ public class User {
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
+    @JsonIgnore
     private List<Task> taskList;
 
     @Column(name = "verification_code", length = 64)
@@ -49,6 +54,7 @@ public class User {
     private boolean twoauth; // в названии булева поля не следует использовать предлог "is" при использовании библиотеки Jackson, иначе не будет маппиться
 
     // Получаем первую букву имени пользователя
+    @JsonIgnore
     public String getInitials() {
         return String.valueOf(name.charAt(0));
     }

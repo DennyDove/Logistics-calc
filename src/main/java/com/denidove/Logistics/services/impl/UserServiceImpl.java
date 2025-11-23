@@ -11,6 +11,7 @@ import net.bytebuddy.utility.RandomString;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.Optional;
 
 @Service
@@ -56,10 +57,13 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(user);
 
-        simpleMailService.sendRegEmail(user, randomCode);
+        try {
+            simpleMailService.sendRegEmail(user, randomCode);
+        } catch (Exception e) {}
         //emailService.sendRegistrationEmail(user, randomCode);
     }
 
+    // Подтверждение регистрации пользователя
     public boolean verify(String code) {
         User user = userRepository.findByVerificationCode(code).get();
         if(user == null || user.isEnabled()) return false;

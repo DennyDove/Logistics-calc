@@ -5,6 +5,7 @@
 let name = document.getElementById("name");
 let login = document.getElementById("login");
 let age = document.getElementById("age");
+let phone = document.getElementById("phone");
 let email = document.getElementById("email");
 let password = document.getElementById("password");
 let twoauth = document.getElementById("twoFAuth");
@@ -72,6 +73,7 @@ async function createUser() {
   let obj = {
     name : name.value,
     login : login.value,
+    phone : phone.value,
     email : email.value,
     age : age.value,
     password : password.value,

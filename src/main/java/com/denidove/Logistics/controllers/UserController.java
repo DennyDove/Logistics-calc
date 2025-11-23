@@ -44,7 +44,8 @@ public class UserController {
             throws UnsupportedEncodingException, MessagingException {
         //userService.save(user);
 
-        userSessionService.setSiteUrl(getSiteURL(request));
+        userSessionService.saveSiteUrl(user.getLogin(), getSiteURL(request));
+
         userService.register(user);
         //return "register_success";
     }

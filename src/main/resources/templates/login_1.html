@@ -24,38 +24,36 @@
         <br /><br />
         <div id="login_holder">
           <div class="regform">
-            <div th:if="${param.error}">
-        			Неверный пароль или имя пользователя.</div>
+
+            <div th:if="${errorMessage}"> [[${errorMessage}]]</div>
+
+            <div th:if="${param.error == 'invalid_code'}">
+        			Упс... Неверный код подтверждения.</div>
+            <div th:if="${param.error == 'bad_credentials'}">
+          			Упс... Неверный логин, пароль или одноразовый код!</div>
+
         		<div th:if="${param.logout}">
         			Вы вышли из профиля.</div>
-
-            <div th:if="${is2FAuth == true}">
-              <form th:action="@{/login}" method="post">
-                <h1> Вход в систему </h1>
-                 <p><input type="hidden" name="username" placeholder="Ваш логин" id="login" th:value="${user.username}"></p>
-                 <p><input type="hidden" name="password" placeholder="Ваш Пароль" id="password" th:value="${user.password}"></p>
-                <p><input type='text' name="code" placeholder="Код подтверждения"/></p>
-                <p><input type="submit" value=" Войти " /></p>
-              </form>
-            </div>
-            <div th:if="${is2FAuth == false}">
-              <form th:action="@{/login}" method="post">
-                <h1> Вход в систему </h1>
-                 <p><input type="hidden" name="username" placeholder="Ваш логин" id="login" th:value="${user.username}"></p>
-                 <p><input type="hidden" name="password" placeholder="Ваш Пароль" id="password" th:value="${user.password}"></p>
-                 <P> Продолжить без 2-х факторной аутентификации </p>
-                <p><input type="submit" value=" Войти " /></p>
-              </form>
-            </div>
+            <form th:action="@{/login}" method="post" th:object="${user}">
+              <h1> Вход в систему </h1>
+              <p><input type="text" placeholder="Ваш логин" id="login" th:field="*{username}"></p>
+              <p><input type="password" placeholder="Ваш Пароль" id="password" th:field="*{password}"></p>
+              <p> <a href="/registration"> Зарегистрироваться </a> </p>
+              <p> <a href="/reset-page"> Забыл пароль </a> </p>
+              <p><input type="submit" value=" Войти " /></p>
+            </form>
+            <!-- <p><button id="loginButton"> Войти </button></p> -->
           </div>
+        </div>
+
       </div>
 
       <div id="footer">
           <div class="rights_text_holder">
               <p class="shrimping_height"> 2025 &#169; Все права защищены.</p>
               <p class="shrimping_height">
-        <span id="trade_mark"><a href="/"> ИП Скляр Федор Васильевич
-            <!-- OOO &#171;Logistics Pro&#187; --> </a></span>.</p>
+            <span id="trade_mark"><a href="/"> ИП Скляр Федор Васильевич
+                <!-- OOO &#171;Logistics Pro&#187; --> </a></span>.</p>
               <p class="shrimping_height">Полное или частичное использование материалов данного сайта возможно только с письменного разрешения администрации сайта.</p>
           </div>
       </div>

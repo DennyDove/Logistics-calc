@@ -1,11 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta http-equiv="content-type" content="text/html" charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Main page</title>
-    <link href="styles/style.css" th:href="@{styles/style.css}" rel="stylesheet" type="text/css"/>
+  <meta http-equiv="content-type" content="text/html" charset="UTF-8">
+  <title>Main page</title>
+  <link href="styles/style.css" th:href="@{styles/style.css}" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 <!-- Основной контейнер, включающий остальные DIV-->
@@ -27,6 +25,8 @@
         <div class="hide-error" id="errorAge"><p> Возраст должен быть в диапазоне от 16 до 100 лет :) </p></div>
         <p><input type="email" placeholder="Ваш e-mail" id="email"></p>
         <div class="hide-error" id="errorEmail"><p> Некорректно введен e-mail </p></div>
+        <p><input type="text" placeholder="Ваш телефон" id="phone"></p>
+        <div class="hide-error" id="errorPhone"><p> Некорректно введен номер телефона </p></div>
         <p><input type="password" placeholder="Пароль" id="password"></p>
         <p><input type="password" placeholder="Подтвердите пароль" id="confirmPassword"></p>
         <p><input type="checkbox" id="twoFAuth" checked> <label for="twoFAuth">Установить 2-х факторную аутентификацию </label></p>

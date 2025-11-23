@@ -39,7 +39,8 @@
         <div class="logistic_calc" style="height: 350px;" id="calcDiv">
           <h1>Рассчитать стоимость доставки</h1>
           <br>
-          <form id="form">
+            <!-- В этой форме ранее введеные неавторизованным пользователем значения СОХРАНЯЮТСЯ -->
+            <form id="form">
 
             <!--<h2>Пункт отправления</h2>-->
             <label for="startPoint">Пункт отправления:</label>
@@ -78,17 +79,27 @@
               <div class="hide" id="loading" style="margin-top: 15px"> <img src="images/loading1.gif" width="87" height="23" border="0"> </div>
 
               <div class="hide" id="vozovoz" style="margin-top: 12px; margin-bottom: 17px;">
-                <img src="images/vozovoz.jpg" width="87" height="23" border="0"> <br>
+                <img th:src="@{images/vozovoz.jpg}" width="87" height="23" border="0"> <br>
                 <div class="normalText" id="result1" style="position: relative; top: 5px; bottom: 5px;"></div><button id="orderButton1" style="float: right;">Оформить заказ</button>
               </div>
               <div class="hide" id="delline" style="margin-top: 12px; margin-bottom: 17px;">
-                <img src="images/delline.jpg" width="87" height="23" border="0"> <br>
+                <img th:src="@{images/delline.jpg}" width="87" height="23" border="0"> <br>
                 <div class="normalText" id="result2" style="position: relative; top: 5px; bottom: 5px;"></div><button id="orderButton2" style="float: right;">Оформить заказ</button>
               </div>
               <div class="hide" id="nordw" style="margin-top: 12px; margin-bottom: 17px;">
-                <img src="images/nordw.JPG" width="87" height="23" border="0"> <br>
+                <img th:src="@{images/nordw.jpg}" width="87" height="23" border="0"> <br>
                 <div class="normalText" id="result3" style="position: relative; top: 5px; bottom: 5px;"></div><button id="orderButton3" style="float: right;">Оформить заказ</button>
               </div>
+          </div>
+          <div th:if="${resultsList}" th:each="result: ${resultsList}" id="results_auth">
+
+              <div class="task_logo">
+                  <img th:src="@{images/{image}(image=${task.companyLogo})}" width="87" height="23">
+              </div>
+              <div class="cart_text">[[ ${result.companyName} ]]</div>
+              <div class="cart_text">[[ ${result.price} ]]</div>
+              <div class="cart_text">[[ ${result.days} ]]</div>
+
           </div>
 
         </div>

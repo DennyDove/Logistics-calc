@@ -33,61 +33,17 @@ public class NordWheelController {
 
     @PostMapping("/nordwcalc")
     public ResponseEntity<TaskDto> nordWheelCalc(@RequestBody TaskDto taskDto) {
-
         //List<City> cities = List.of(City.Moscow, City.Piter, City.Saratov, City.Sochi);
 
-        var delivery = new NordWheel();
-        var nordWheelCities = new NordWheelCities();
-
-        Integer startPoint = 0;
-        Integer destination = 0;
-        Double width = taskDto.getWidth();
-        Double length = taskDto.getLength();
-        Double height = taskDto.getHeight();
-
-        Double volume = width * length * height;
-        Double weight = taskDto.getWeight();
-
-        if(length > 12.9 || width > 2.4 || height > 2.4) throw new IncorrectDimensionException("Весогабаритные характеристики груза превышают допустимые!");
-        String errorMsg = ""; // переменная для записи сообщения об ошибке, см. ниже в блоке try-catch
+        if(taskDto.getLength() > 12.9 || taskDto.getWidth() > 2.4 || taskDto.getHeight() > 2.4)
+            throw new IncorrectDimensionException("Весогабаритные характеристики груза превышают допустимые!");
 
         try {
-            //toDo Создать отдельный метод для чистоты кода
-            // также попробосоздать создать обработку ошибки, если город не найден
-            nordWheelCities = nordWheelService.getCityList();
-            var cityList = nordWheelCities.getData();
-            for(NordWheelCities.Data c : cityList) {
-                if(c.getName().equals(taskDto.getStartPoint())) {
-                    startPoint = c.getId();
-                }
-                if(c.getName().equals(taskDto.getDestination())) {
-                    destination = c.getId();
-                }
-            }
-            if(startPoint == 0 || destination == 0) {
-                errorMsg = "Указанный город отправления или доставки не обслуживается";
-                throw new BadRequestException(errorMsg);
-            }
-
-            delivery = nordWheelService.sendRequest(startPoint, destination, weight.floatValue(), volume.floatValue());
-
-            if(delivery.getData().getTotal() != null) {
-                Double price = delivery.getData().getTotal();
-                Integer days = delivery.getData().getDays();
-                //toDo перенести это в сервисный класс
-                taskDto.setCompanyName("Nord Wheel");
-                taskDto.setCompanyLogo("nordw.jpg");
-                taskDto.setPrice(price);
-                taskDto.setDays(days);
-
-                // Просто сохраняем состояние запроса пользователя
-                taskService.saveToDto("nordw", taskDto);
-            }
+            var delivery = nordWheelService.sendRequest(taskDto);
         } catch (JsonProcessingException j) {
             j.printStackTrace();
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new CalcRequestException("Некорректные параметры запроса. " + errorMsg);
+            throw new CalcRequestException("Некорректные параметры запроса. " + e.getMessage());
         }
 
         return ResponseEntity

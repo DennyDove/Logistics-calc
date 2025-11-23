@@ -72,6 +72,10 @@ public class SecurityUser implements UserDetails {
         return user.getLogin();
     }
 
+    public String getPhone() {
+        return user.getPhone();
+    }
+
     public Integer getAge() {
         return user.getAge();
     }
@@ -83,5 +87,7 @@ public class SecurityUser implements UserDetails {
     public Role getRole() {
         return user.getRole();
     }
+
+    public Boolean isTwoauth() { return user.isTwoauth(); }
 
 }

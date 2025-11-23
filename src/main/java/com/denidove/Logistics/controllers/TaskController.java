@@ -1,5 +1,7 @@
 package com.denidove.Logistics.controllers;
 
+import com.denidove.Logistics.dto.TaskDto;
+import com.denidove.Logistics.dto.UserDto;
 import com.denidove.Logistics.entities.SecurityUser;
 import com.denidove.Logistics.entities.Task;
 import com.denidove.Logistics.entities.User;
@@ -8,26 +10,25 @@ import com.denidove.Logistics.enums.TaskStatus;
 import com.denidove.Logistics.services.TaskService;
 import com.denidove.Logistics.services.UserService;
 import com.denidove.Logistics.services.UserSessionService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
 @Controller
+@RequiredArgsConstructor
 public class TaskController {
 
     private final TaskService taskService;
     private final UserService userService;
     private final UserSessionService userSessionService;
-
-    public TaskController(TaskService taskService, UserService userService,
-                          UserSessionService userSessionService) {
-        this.taskService = taskService;
-        this.userService = userService;
-        this.userSessionService = userSessionService;
-    }
 
     @GetMapping("/task-details")
     public String getTaskDetails(Model model, @RequestParam(value = "task", required = true) Long taskId) {

@@ -5,9 +5,13 @@ import com.denidove.Logistics.email.EmailService;
 import com.denidove.Logistics.email.SimpleMailService;
 import com.denidove.Logistics.entities.Task;
 import com.denidove.Logistics.entities.User;
+import com.denidove.Logistics.security.jwt.JwtService;
 import com.denidove.Logistics.services.TaskService;
 import com.denidove.Logistics.services.UserSessionService;
 
+import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,20 +24,29 @@ public class OrderController {
     private final UserSessionService userSessionService;
     private final EmailService emailService;
     private final SimpleMailService simpleMailService;
+    private final JwtService jwtService;
+
+    private static final Logger log = LoggerFactory.getLogger(OrderController.class);
 
     public OrderController(TaskService taskService, EmailService emailService,
-                           SimpleMailService simpleMailService, UserSessionService userSessionService) {
+                           SimpleMailService simpleMailService, UserSessionService userSessionService,
+                           JwtService jwtService) {
         this.taskService = taskService;
         this.emailService = emailService;
         this.simpleMailService = simpleMailService;
         this.userSessionService = userSessionService;
+        this.jwtService = jwtService;
     }
 
     @PostMapping("/order")
-    public ResponseEntity<TaskDto> saveOrder(@RequestParam String key) {
+    public ResponseEntity<TaskDto> saveOrder(@RequestParam(value = "key", required = true) String key,
+                                             HttpServletRequest request) {
         Task task = new Task();
         User user = userSessionService.getSecurityUser().getUser();
-        var taskDto = userSessionService.getTaskDto().get(key);
+
+        //toDo Исправить, чтобы находила конкретную компанию - key
+        var taskDto = userSessionService.getTaskDto(user.getLogin(), key); //toDo get(key) - DONE!
+
         task.setCompanyName(taskDto.getCompanyName());
         task.setCompanyLogo(taskDto.getCompanyLogo());
         task.setCargoName(taskDto.getCargoName());
@@ -42,11 +55,12 @@ public class OrderController {
         task.setWeight(taskDto.getWeight());
         task.setPrice(taskDto.getPrice());
 
-        boolean authStatus = userSessionService.getAuthStatus();
-
         task.setUser(user);
         Long orderId = taskService.save(task);
         taskDto.setId(orderId);
+
+        var guestId = userSessionService.getGuestIdFromCookie(request);
+        userSessionService.clearGuestData(guestId); // Для обнуления данных в форме
 
         /*
         String msgTopic = "Заказ на сайте Logistics.pro";
@@ -59,11 +73,13 @@ public class OrderController {
                         Команда ООО "Логистик Плюс"
                         """;
         var msgText = String.format(rawText, user.getName(), orderId, taskDto.getPrice(), taskDto.getDays());*/
-
         //emailService.sendOrderEmail(taskDto, user);
-        simpleMailService.sendOrderEmail(taskDto, user);
-
-        userSessionService.getTaskDto().clear();
+        try {
+            simpleMailService.sendOrderEmail(taskDto, user);
+            simpleMailService.notifyLogisticCompany(taskDto, user);
+        } catch (Exception e) {
+            log.error("Ошибка при отправке e-mail уведомлений: {}", e.getMessage());
+        }
 
         return ResponseEntity.ok().body(taskDto);
     }

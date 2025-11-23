@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="content-type" content="text/html" charset="UTF-8">
+    <title>Main page</title>
+    <link href="styles/style.css" th:href="@{styles/style.css}" rel="stylesheet" type="text/css"/>
+    <!-- В шаблонизаторе Thymeleaf джава скрипт подключается особым образом. См. ниже -->
+    <script th:src="@{/js/script.js}"></script>
+
+</head>
+<body>
+<!-- <h1>Клуб нумизматов</h1> -->
+<h3></h3>
+<!-- Основной контейнер, включающий остальные DIV-->
+  <div id="container">
+
+      <div class="header">
+        <div class="block_logo"> <a href="/"> <img src="images/logo.jpg" width="433" height="123" border="0"> </a> </div>
+        <div class="block_holder1"></div>
+      </div>
+      <div class="line1"></div>
+      <div id="content_container">
+
+        <br /><br />
+        <div id="login_holder">
+          <div class="regform">
+
+              <!-- 🔴 Ошибки -->
+              <div th:if="${errorMessage}">
+                  <p th:text="${errorMessage}"></p>
+              </div>
+
+            <div th:if="${is2FAuth == true}">
+              <form th:action="@{/verify-code}" method="post">
+                <h1> Вход в систему </h1>
+
+                <p><input type='text' name="code" placeholder="Код подтверждения"/></p>
+                <p><input type="submit" value=" Войти " /></p>
+              </form>
+            </div>
+
+          <!-- 🟡 Если реализован вариант 1 (вся логика авторизации вручную пролписана в 2-х контроллерах -->
+            <div th:if="${is2FAuth == false}">
+              <form th:action="@{/}" method="get">
+                <h1> Вход в систему </h1>
+                 <P> Продолжить без 2-х факторной аутентификации </p>
+                <p><input type="submit" value=" Войти " /></p>
+              </form>
+            </div>
+          </div>
+      </div>
+
+      <div id="footer">
+          <div class="rights_text_holder">
+              <p class="shrimping_height"> 2025 &#169; Все права защищены.</p>
+              <p class="shrimping_height">
+        <span id="trade_mark"><a href="/"> ИП Скляр Федор Васильевич
+            <!-- OOO &#171;Logistics Pro&#187; --> </a></span>.</p>
+              <p class="shrimping_height">Полное или частичное использование материалов данного сайта возможно только с письменного разрешения администрации сайта.</p>
+          </div>
+      </div>
+
+  </div>
+
+</body>
+</html>

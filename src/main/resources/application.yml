@@ -9,8 +9,8 @@ spring:
       max-request-size: 1280KB
 
   datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/logistics7
+    driver-class-name: org.postgresql.Driver    # ?sslmode=require - нужно чтобы с БД по умолчанию использовалось SSL соединение
+    url: jdbc:postgresql://localhost:5432/logistics7 #?sslmode=require
     username: postgres
     password: root
 
@@ -36,12 +36,42 @@ spring:
       continue-on-error: false
       mode: never #always
 
+  jwt:
+    secret: my-super-secret-and-long-key-1234567890
+    expiration: 3600000 # 1 час в миллисекундах     #23000
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      # если Redis требует пароль, добавь:
+      # password: yourpassword
+      # для корректной работы Redis его нужно установать в другую папку (чтобы не было проблем с правами доступа)
+
   #thymeleaf:
   #  prefix-classpath: /static/
+
+# отдельная настройка для использования сертификата https
+server:
+  port: 8080
+  ssl:
+    enabled: true
+    key-store: classpath:keystore.p12
+    key-store-password: 1234567
+    key-store-type: PKCS12
+    key-alias: mycert
 
 logging:
   level:
     root: info
+    org.simplejavamail: DEBUG
+    org.springframework.mail: DEBUG
+
+    #Временно, для отладки:
+    #org.springframework.security: DEBUG
+    #org.springframework.security.web: TRACE
+    #org.apache.catalina.connector: DEBUG
+    #org.springframework.web: DEBUG
 
 ---
 

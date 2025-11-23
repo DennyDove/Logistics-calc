@@ -40,7 +40,8 @@
         <div class="logistic_calc">
           <h1>Рассчитать стоимость доставки</h1>
           <br>
-          <form th:action="@{/order-dto}" method="post" th:object="${task}" id="form">
+          <!-- В этой форме ранее введеные неавторизованным ползователем значения НЕ сохраняются -->
+          <form th:action="@{/calc-dto}" method="post" th:object="${task}" id="form">
 
             <!--<h2>Пункт отправления</h2>-->
             <label for="cityList">Пункт отправления:</label>
@@ -69,7 +70,7 @@
               <input type="text" th:field="*{weight}" placeholder="Вес груза"> Вес груза, кг.</input>
               <br>
               <br>
-          <button type="submit">Рассчитать</button>
+            <button type="submit">Рассчитать</button>
           </form>
 
           <div class="hide" id="loading" style="margin-top: 15px"> <img src="images/loading1.gif" width="87" height="23" border="0"> </div>

@@ -10,6 +10,7 @@ import com.denidove.Logistics.services.TaskService;
 import com.denidove.Logistics.services.UserSessionService;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpStatusCodeException;
@@ -25,28 +26,24 @@ import java.util.List;
 @RestController
 public class DellineController {
 
-    private  final UserSessionService userSessionService;
-    private final TaskService taskService;
+    private final UserSessionService userSessionService;
     private final DellineService dellineService;
 
-    public DellineController(TaskService taskService,
-                             DellineService dellineService, UserSessionService userSessionService) {
-        this.taskService = taskService;
+    public DellineController(DellineService dellineService, UserSessionService userSessionService) {
         this.dellineService = dellineService;
         this.userSessionService = userSessionService;
     }
 
     @PostMapping("/delline")
-    public ResponseEntity<TaskDto> dellineCalc(@RequestBody TaskDto taskDto) {
+    public ResponseEntity<TaskDto> dellineCalc(HttpServletRequest request, @RequestBody TaskDto taskDto) {
         //List<City> cities = List.of(City.Moscow, City.Piter, City.Saratov, City.Sochi);
         if(taskDto.getLength() > 12.9 || taskDto.getWidth() > 2.4 || taskDto.getHeight() > 2.4)
             throw new IncorrectDimensionException("Весогабаритные характеристики груза превышают допустимые!");
 
         try {
-            var delivery = dellineService.sendRequest(taskDto);
+            var delivery = dellineService.sendRequest(request, taskDto);
         } catch (HttpStatusCodeException e) {
             if (e.getStatusCode() == HttpStatus.BAD_REQUEST) {
-                //toDo убрать лишнюю err
                 String err = "";
                 String responseBody = e.getResponseBodyAsString();
                 /*
@@ -59,7 +56,6 @@ public class DellineController {
                 try {
                     ObjectMapper mapper = new ObjectMapper();
                     mapper.configure(DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY, true);
-                                                                                //toDo
                     DellineErr dellineErr = mapper.readValue(responseBody, DellineErr.class);
                     DellineErr.Errors[] errors = dellineErr.getErrors();
                     err = errors[0].getDetail();

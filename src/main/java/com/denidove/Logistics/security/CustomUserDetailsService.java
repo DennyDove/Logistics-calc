@@ -15,8 +15,6 @@ import java.util.Optional;
 @Component
 public class CustomUserDetailsService implements UserDetailsService {
 
-    //@Autowired
-    //private UserService userService;
     @Autowired
     private  UserRepository userRepository;
 
