@@ -21,12 +21,17 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.PortMapper;
+import org.springframework.security.web.PortMapperImpl;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.context.SecurityContextHolderFilter;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Configuration
 @EnableWebSecurity
@@ -72,6 +77,16 @@ public class SecurityConfiguration {
     }
     */
 
+    /* Для отладки корректного порта (чтобы побороть редирект на 8443)
+    @Bean
+    public PortMapper portMapper() {
+        PortMapperImpl mapper = new PortMapperImpl();
+        Map<String, String> map = new HashMap<>();
+        map.put("8080", "8080"); // 👈 http->https (теперь HTTPS=8080)
+        mapper.setPortMappings(map);
+        return mapper;
+    }*/
+
 
     private static final String[] PUBLIC_MATCHERS = {
             "/", "/js/**", "/styles/**", "/images/**",
@@ -111,6 +126,10 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFormLoginChain(HttpSecurity http) throws Exception {
         http
                 .securityMatcher("/login", "/login-1", "/login-2", "/verify-code", "/registration", "/adduser", "/confirm", "/calc-dto", "/vozcalc", "/delline", "/reset-page", "/reset-mail", "/reset", "/save-pass")
+                /* Для отладки корректного порта (чтобы побороть редирект на 8443)
+                .portMapper(pm -> pm
+                       .http(8080).mapsTo(8080) // 👈 говорим, что HTTPS = 8080
+                )*/
                 .csrf(csrf -> csrf.disable()) // 🚫 Отключаем CSRF, т.к. у нас формы POST-запросов генерируются Thymeleaf
                 .cors(cors -> cors.disable()) // 🚫 Отключаем CORS, т.к. фронт и бэк работают на одном origin
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
@@ -149,7 +168,9 @@ public class SecurityConfiguration {
         http
                 .securityMatcher("/**")
                 .csrf(csrf -> csrf.disable())
-                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                        .sessionFixation().none()  // для STATELESS это более надежно
+                )
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(customEntryPoint)
                 )
@@ -159,8 +180,9 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.GET, "/admin-lk", "/active-orders").hasAuthority("Admin")
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(guestContextFilter, SecurityContextHolderFilter.class) // фильтр для сохранения состояния неавторизованного пользователя
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                //.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class) // Закомментировал этот вариант, т.к. при этом при запросе на /order аутентификация слетала (самопроизвольно устанавливался anonymous-token)
+                .addFilterBefore(jwtAuthFilter, AnonymousAuthenticationFilter.class) // Это гарантирует, что JWT-фильтр выполнится раньше, чем Spring выставит anonymous-token, и корректно заполнит SecurityContextHolder для текущего запроса.
+                .addFilterAfter(guestContextFilter, JwtAuthenticationFilter.class) // фильтр для сохранения состояния неавторизованного пользователя
                 .logout(logout -> logout
                         .logoutUrl("/logout") // эндпоинт выхода
                         .addLogoutHandler((request, response, authentication) -> {

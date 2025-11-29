@@ -20,6 +20,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        //toDo                                     сделать логин - номер телефона
         Optional<User> userFromDb = userRepository.findUserByLogin(username);
         if (userFromDb.isEmpty()) {
             throw new UsernameNotFoundException("User not found");

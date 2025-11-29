@@ -89,11 +89,11 @@ public class AuthenticationController {
         String guestId = getGuestIdFromCookie(request);
 
         if (!loginStatus) {
-            //taskDto = userSessionService.loadGuestTask(guestId);
-            //if (taskDto == null) taskDto = new TaskDto();
+            taskDto = userSessionService.loadGuestTask(guestId);
+            if (taskDto == null) taskDto = new TaskDto();
             // Если не добавить строчу ниже, то Thymeleaf будет выдавать ошибку и редиректить.
             // Но в данном случае редирект будет на localhost:8080/login-1, но не на localhost:8443/login-1
-            taskDto = new TaskDto();
+
             model.addAttribute("task", taskDto); // Из этого объекта вставляются значения в ранее заполенные пользователем поля формы (сохраненные значения)
             return "index_unauth";
 
@@ -156,7 +156,7 @@ public class AuthenticationController {
     @GetMapping("/login-2")
     public String showVerifyPage(HttpServletResponse response, Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        // Если пользоватьель успешно прошел проверку лоина и пароля (в CustomAuthenticationProvider)
+        // Если пользователь успешно прошел проверку лоина и пароля (в CustomAuthenticationProvider)
         // и у него двухфакторка выключена (т.е. isTwoauth() == false), тогда сразу редирект на главную:
 
         //toDo сделали дополнительную проверку!!!
@@ -216,7 +216,8 @@ public class AuthenticationController {
     // 4️⃣  POST /verify-code — проверка кода подтверждения
     // -------------------------------------------------------------
     @PostMapping("/verify-code")
-    public String verifyCode(Model model, @RequestParam("code") String code, HttpServletResponse response) {
+    public String verifyCode(Model model, @RequestParam("code") String code,
+                             HttpServletResponse response, HttpServletRequest request) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         var userId = (Long) auth.getPrincipal(); // в Principal мы сохранили userId, поэтому достаем principal;
         User pendingUser = userRedisService.getPendingUser(userId);
@@ -254,6 +255,25 @@ public class AuthenticationController {
                 .build();
 
         response.addHeader("Set-Cookie", cookie.toString());
+
+
+        //toDo новые правки --- ВАЖНО: инвалидируем сессию и удаляем JSESSIONID (для большей надежности и предсказуемости)---
+
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+        ResponseCookie removeSession = ResponseCookie.from("JSESSIONID", "")
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(0)
+                .sameSite("Strict")
+                .build();
+        response.addHeader("Set-Cookie", removeSession.toString());
+
+        // Очистим SecurityContext на сервере (чтобы не осталось pending auth в текущем потоке)
+        SecurityContextHolder.clearContext();
 
         // Удаляем pending
         userRedisService.clearPendingAuth(pendingUser.getId());

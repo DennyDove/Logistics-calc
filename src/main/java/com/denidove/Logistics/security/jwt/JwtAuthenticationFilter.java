@@ -9,7 +9,9 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseCookie;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -42,12 +44,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // ✅ Логируем факт вызова фильтра и URI
         System.out.println(">>> JwtAuthFilter start for URI: " + request.getRequestURI());
 
+
+
         // 1️⃣ Проверяем, есть ли в контексте уже аутентифицированный пользователь
         // (например, если контекст уже был установлен где-то ранее)
-        if (SecurityContextHolder.getContext().getAuthentication() != null) {
+        Authentication existing = SecurityContextHolder.getContext().getAuthentication();
+        if (existing != null && existing.isAuthenticated() && !(existing instanceof AnonymousAuthenticationToken)) {
             filterChain.doFilter(request, response);
             return;
         }
+
+
 
         // 2️⃣ Пытаемся достать JWT-токен из cookie
         String jwt = extractJwtFromCookie(request);
@@ -75,6 +82,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     .sameSite("Strict")
                     .build();
             response.addHeader("Set-Cookie", cookie.toString());
+
+            //toDo --- новые вставки
+            //filterChain.doFilter(request, response);
+            //return;
         }
 
         // Если имя пользователя не найдено — токен недействителен

@@ -68,7 +68,7 @@ logging:
     org.springframework.mail: DEBUG
 
     #Временно, для отладки:
-    #org.springframework.security: DEBUG
+    org.springframework.security: DEBUG
     #org.springframework.security.web: TRACE
     #org.apache.catalina.connector: DEBUG
     #org.springframework.web: DEBUG
