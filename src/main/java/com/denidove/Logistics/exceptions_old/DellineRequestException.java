@@ -1,4 +1,4 @@
-package com.denidove.Logistics.exceptions;
+package com.denidove.Logistics.exceptions_old;
 
 public class DellineRequestException extends RuntimeException {
     private static String price;

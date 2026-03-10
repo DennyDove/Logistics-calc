@@ -71,12 +71,12 @@ public class VerifyController {
         this.taskService = taskService;
     }*/
 
-    @GetMapping("/verify")
+    @GetMapping("auth/verify")
     public String saveOrderDto(Model model, @RequestParam("code") String code) {
         if(userService.verify(code)) {
             System.out.println("Verification confirmed!");
         }
-        return "success_verify.html";  //  Можно писать success_verify.html, но предпочтительнее без "html"
+        return "success_verify";  //  Можно писать success_verify.html, но предпочтительнее без "html"
     }
 
     // Рендеринг страницы сброса пароля

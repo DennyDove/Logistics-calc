@@ -1,14 +1,11 @@
 package com.denidove.Logistics.security;
 
-import com.denidove.Logistics.exceptions.VerificationCodeErrorException;
-import jakarta.servlet.ServletException;
+import com.denidove.Logistics.exceptions_old.VerificationCodeErrorException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.DefaultRedirectStrategy;
-import org.springframework.security.web.RedirectStrategy;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
 

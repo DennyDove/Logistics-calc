@@ -2,12 +2,14 @@ package com.denidove.Logistics.security.jwt;
 
 import com.denidove.Logistics.entities.SecurityUser;
 import com.denidove.Logistics.repositories.UserRepository;
+import com.denidove.Logistics.security.CustomUserDetailsService;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,15 +26,11 @@ import java.io.IOException;
 import java.util.Arrays;
 
 @Component
+@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
-    private final UserDetailsService userDetailsService;
-
-    public JwtAuthenticationFilter(JwtService jwtService, UserDetailsService userDetailsService) {
-        this.jwtService = jwtService;
-        this.userDetailsService = userDetailsService;
-    }
+    private final CustomUserDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(
@@ -45,6 +43,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         System.out.println(">>> JwtAuthFilter start for URI: " + request.getRequestURI());
 
 
+        if (request.getRequestURI().startsWith("/login-main")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         // 1️⃣ Проверяем, есть ли в контексте уже аутентифицированный пользователь
         // (например, если контекст уже был установлен где-то ранее)
@@ -53,7 +55,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-
 
 
         // 2️⃣ Пытаемся достать JWT-токен из cookie
@@ -66,39 +67,28 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        // 3️⃣ Извлекаем из токена username (subject)
-        String username = null;
+        // 3️⃣ Извлекаем из токена userId (subject)
+        Long userId = null;
         try {
-            username = jwtService.extractUsername(jwt);
+            userId = jwtService.extractUserId(jwt);
         } catch (JwtException j) {
             // Удаляем cookie с JWT
             // Если cookie не удалить, тогда при переходе на страницу "/" с "протухшим" jwt-токеном
             // может получиться непредсказуемое поведение браузера. Например циклический редирект
-            ResponseCookie cookie = ResponseCookie.from("jwt", "")
-                    .httpOnly(true)
-                    .secure(true)
-                    .path("/")
-                    .maxAge(0)
-                    .sameSite("Strict")
-                    .build();
-            response.addHeader("Set-Cookie", cookie.toString());
-
-            //toDo --- новые вставки
-            //filterChain.doFilter(request, response);
-            //return;
+            jwtService.clearJwtCookie(response);
         }
 
         // Если имя пользователя не найдено — токен недействителен
-        if (username == null) {
+        if (userId == null) {
             filterChain.doFilter(request, response);
             return;
         }
 
         // 4️⃣ Загружаем данные пользователя из БД через UserDetailsService
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        UserDetails userDetails = userDetailsService.loadUserById(userId);
 
-        System.out.println("JWT username: " + username);
+        System.out.println("JWT userId: " + userId);
         System.out.println("UserDetails username: " + ((SecurityUser) userDetails).getLogin());
 
         // 5️⃣ Проверяем, что токен действительно принадлежит этому пользователю и не истёк

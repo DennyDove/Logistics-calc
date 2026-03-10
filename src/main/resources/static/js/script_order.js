@@ -5,7 +5,7 @@ async function taskOrder(company) {
       key: company
   };
 
-  let response = await fetch("/order",
+  let response = await fetch("/api/order",
     {
     	method: 'POST',
     	headers: {
@@ -24,8 +24,9 @@ async function taskOrder(company) {
     orderOk_text.innerHTML = "<img src=\"images/" + data.key + ".jpg\" width=\"87\" height=\"23\"> <br> <span id=\"price_span\">" + orderObject.price + "</span> руб." + "  мин. срок доставки: " + orderObject.days +
                              " дн. <br> <br> Ваш заказ №" + orderObject.id + " оформлен в работу";
 
-  } else if (response.status === 401) {  // Нужно это обязательно прописать, иначе браузер сам не будет реально редиректить на login-1
-          window.location.href = "/login-1";
+  } else if (response.status === 401) {  // Нужно это обязательно прописать, иначе браузер сам не будет реально редиректить на login-main
+          window.location.href = "/login-main";
+          return
 
   } else {
     alert("HTTP error: "+ response.status);

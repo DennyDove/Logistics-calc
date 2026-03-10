@@ -8,9 +8,10 @@ import org.springframework.web.client.HttpStatusCodeException;
 public interface DellineService {
 
     // Отправка POST-запроса на сервис Delline
-    public TaskDto sendRequest(HttpServletRequest request, TaskDto taskDto) throws JsonProcessingException, HttpStatusCodeException;
+    public TaskDto sendRequest(HttpServletRequest request, TaskDto taskDto);
 
-    // Получение абсолютного сетевого пути из текушей среды
-    public String getBaseUrl(HttpServletRequest request);
+    // Получение абсолютного сетевого пути из текушей среды - в новой архитектуре не используется
+    //public String getBaseUrl(HttpServletRequest request);
 
 }
+

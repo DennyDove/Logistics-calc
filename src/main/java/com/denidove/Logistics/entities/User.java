@@ -19,22 +19,24 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    // По умолчанию поле всегда @Column(nullable = true),
+    // Аннотация ниже означает NOT NULL - убрал т.к. в БД могут создаваться пустые поля
+    //@Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private Integer age;
 
-    @Column (nullable = false)
+    @Column (unique = true)  //(nullable = false)
     private String login;
 
-    @Column (nullable = false)
+    @Column (unique = true)  //(nullable = false)
     private String email;
 
-    @Column //(nullable = false)
+    @Column (unique = true) //(nullable = false)
     private String phone;
 
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private String password;
 
     @ManyToOne

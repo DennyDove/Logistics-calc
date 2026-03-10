@@ -8,8 +8,8 @@ import com.denidove.Logistics.entities.SecurityUser;
 import com.denidove.Logistics.entities.User;
 import com.denidove.Logistics.enums.City;
 import com.denidove.Logistics.repositories.UserRepository;
-import com.denidove.Logistics.security.CustomAuthenticationProvider;
 import com.denidove.Logistics.security.jwt.JwtService;
+import com.denidove.Logistics.security.refreshtoken.RefreshTokenService;
 import com.denidove.Logistics.services.UserRedisService;
 import com.denidove.Logistics.services.UserSessionService;
 import jakarta.servlet.http.Cookie;
@@ -18,28 +18,21 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import net.bytebuddy.utility.RandomString;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
-import org.springframework.ui.Model;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 /*
 ✅
@@ -60,13 +53,15 @@ public class AuthenticationController {
     @Autowired
     private SimpleMailService simpleMailService;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
-    private final AuthenticationManager authenticationManager;
+
+    //private final AuthenticationManager authenticationManager; // убрали, чтобы не создавать циклических зависимостей
+    private final PasswordEncoder passwordEncoder;
+
     private final UserSessionService userSessionService;
     private final UserRedisService userRedisService;
     private final JwtService jwtService;
+    private final RefreshTokenService refreshService;
 
     private static final Logger log = LoggerFactory.getLogger(AuthenticationController.class);
 
@@ -102,8 +97,14 @@ public class AuthenticationController {
             taskDto = userSessionService.loadGuestTask(guestId);
             if (taskDto == null) taskDto = new TaskDto();
 
-            model.addAttribute("userInit", user.getInitials());
-            model.addAttribute("name", user.getUsername());
+            /**
+             * Данное выражение нужно для защиты от пустой строки Username.
+             * Если Username = null, тогда просто подставляем Д (в тестовых целях)
+            user.getInitials() != null ? String.valueOf(user.getUsername().charAt(0)) : "Д";
+            */
+
+            model.addAttribute("userInit", !user.getUsername().isEmpty() ? String.valueOf(user.getUsername().charAt(0)) : "Д"); //user.getInitials());
+            model.addAttribute("name", user.getUsername() != null ? String.valueOf(user.getUsername()) : "Денис"); //user.getUsername());
             model.addAttribute("coinsInCart", 0);
             model.addAttribute("task", taskDto); // Из этого объекта вставляются значения в ранее заполенные пользователем поля формы (сохраненные значения)
             //userSessionService.clearGuestData(guestId); // Для обнуления данных в форме - перенес это в OrderController
@@ -122,11 +123,34 @@ public class AuthenticationController {
         return null;
     }
 
+    @GetMapping("/login-main")
+    public String showLoginMainPage(
+            @RequestParam(value = "error", required = false) String error,
+            @RequestParam(value = "logout", required = false) String logout,
+            Model model
+    ) {
+        model.addAttribute("user", new UserDto());
+
+        if (error != null) {
+            switch (error) {
+                case "bad_credentials" -> model.addAttribute("errorMessage", "Неверный логин или пароль.");
+                case "invalid_code" -> model.addAttribute("errorMessage", "Неверный код подтверждения.");
+                case "expired" -> model.addAttribute("errorMessage", "Сессия авторизации истекла. Повторите вход.");
+                default -> model.addAttribute("errorMessage", "Ошибка входа. Попробуйте снова.");
+            }
+        }
+
+        if (logout != null) {
+            model.addAttribute("logoutMessage", "Вы вышли из системы.");
+        }
+
+        return "login_main"; // Можно писать login_1.html, но предпочтительнее без "html"
+    }
 
     // -------------------------------------------------------------
     // 1️⃣  GET /login-1 — форма логина
     // -------------------------------------------------------------
-    @GetMapping("/login-1")
+    @GetMapping("/auth/login-1")
     public String showLoginPage(
             @RequestParam(value = "error", required = false) String error,
             @RequestParam(value = "logout", required = false) String logout,
@@ -153,10 +177,12 @@ public class AuthenticationController {
     // -------------------------------------------------------------
     // 3️⃣  GET /login-2 — форма для кода подтверждения
     // -------------------------------------------------------------
-    @GetMapping("/login-2")
-    public String showVerifyPage(HttpServletResponse response, Model model) {
+    @GetMapping("/auth/login-2")
+    public String showVerifyPage(HttpServletRequest request,
+            HttpServletResponse response, Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        // Если пользователь успешно прошел проверку лоина и пароля (в CustomAuthenticationProvider)
+
+        // Если пользователь успешно прошел проверку логина и пароля (в CustomAuthenticationProvider)
         // и у него двухфакторка выключена (т.е. isTwoauth() == false), тогда сразу редирект на главную:
 
         //toDo сделали дополнительную проверку!!!
@@ -165,7 +191,7 @@ public class AuthenticationController {
             SecurityUser securityUser = ((SecurityUser) auth.getPrincipal());
 
             if(!securityUser.isTwoauth()) {
-                String jwt = jwtService.generateToken(securityUser.getLogin());
+                String jwt = jwtService.generateToken(securityUser.getId());
 
                 ResponseCookie cookie = ResponseCookie.from("jwt", jwt)
                         .httpOnly(true)
@@ -176,6 +202,24 @@ public class AuthenticationController {
                         .build();
 
                 response.addHeader("Set-Cookie", cookie.toString());
+
+                //toDo новые правки --- ВАЖНО: инвалидируем сессию и удаляем JSESSIONID (для большей надежности и предсказуемости)---
+                HttpSession session = request.getSession(false);
+                if (session != null) {
+                    session.invalidate();
+                }
+                ResponseCookie removeSession = ResponseCookie.from("JSESSIONID", "")
+                        .httpOnly(true)
+                        .secure(true)
+                        .path("/")
+                        .maxAge(0)
+                        .sameSite("Strict")
+                        .build();
+                response.addHeader("Set-Cookie", removeSession.toString());
+
+                // Очистим SecurityContext на сервере (чтобы не осталось pending auth в текущем потоке)
+                SecurityContextHolder.clearContext();
+
                 return "redirect:/";
             }
         }
@@ -185,7 +229,7 @@ public class AuthenticationController {
         User pendingUser = userRedisService.getPendingUser(userId);
 
         if (pendingUser == null) {
-            return "redirect:/login-1?error=expired";
+            return "redirect:/auth/login-1?error=expired";
         }
 
         /* Данный блок не нужен.
@@ -215,14 +259,14 @@ public class AuthenticationController {
     // -------------------------------------------------------------
     // 4️⃣  POST /verify-code — проверка кода подтверждения
     // -------------------------------------------------------------
-    @PostMapping("/verify-code")
+    @PostMapping("/auth/verify-code")
     public String verifyCode(Model model, @RequestParam("code") String code,
                              HttpServletResponse response, HttpServletRequest request) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         var userId = (Long) auth.getPrincipal(); // в Principal мы сохранили userId, поэтому достаем principal;
         User pendingUser = userRedisService.getPendingUser(userId);
         if (pendingUser == null) {
-            return "redirect:/login-1?error=expired";
+            return "redirect:/auth/login-1?error=expired";
         }
 
         if (!code.equals(pendingUser.getVerificationCode())) {
@@ -244,7 +288,11 @@ public class AuthenticationController {
         }
 
         // ✅ Успех — генерируем токен и сохраняем в cookie
-        String jwt = jwtService.generateToken(pendingUser.getLogin());
+        String jwt = jwtService.generateToken(pendingUser.getId());
+
+        refreshService.create(pendingUser,
+                request.getHeader("User-Agent"),
+                request.getRemoteAddr());
 
         ResponseCookie cookie = ResponseCookie.from("jwt", jwt)
                 .httpOnly(true)
@@ -258,7 +306,6 @@ public class AuthenticationController {
 
 
         //toDo новые правки --- ВАЖНО: инвалидируем сессию и удаляем JSESSIONID (для большей надежности и предсказуемости)---
-
         HttpSession session = request.getSession(false);
         if (session != null) {
             session.invalidate();
@@ -311,12 +358,12 @@ public class AuthenticationController {
         return "registration.html";
     }
 
-    @GetMapping("/user_profile")
+    @GetMapping("/user-profile")
     public String userProfile(Model model) {
         SecurityUser user = userSessionService.getSecurityUser();
-        var userInit = user.getInitials();
-        model.addAttribute("userInit", userInit);
-        model.addAttribute("name", user.getUsername());
+        //var userInit = user.getInitials();
+        model.addAttribute("userInit", !user.getUser().getName().isEmpty() ? String.valueOf(user.getUser().getName().charAt(0)) : "Д"); //user.getInitials());
+        model.addAttribute("name", !user.getUser().getName().isEmpty() ? String.valueOf(user.getUser().getName()) : "");
         model.addAttribute("login", user.getLogin());
         model.addAttribute("phone", user.getPhone());
         model.addAttribute("email", user.getEmail());
@@ -329,9 +376,8 @@ public class AuthenticationController {
         SecurityUser user = userSessionService.getSecurityUser();
         //toDo
         //boolean isAdmin = false;
-        var userInit = user.getInitials();
-        model.addAttribute("userInit", userInit);
-        model.addAttribute("name", user.getUsername());
+        model.addAttribute("userInit", !user.getUsername().isEmpty() ? String.valueOf(user.getUsername().charAt(0)) : "A"); //user.getInitials());
+        model.addAttribute("name", user.getUsername() != null ? String.valueOf(user.getUsername()) : "Anonymous"); //user.getUsername());
         if(user.getRole().getAuthority().equals("Admin")) {return "admin_lk.html";}
         return "user_lk.html";
     }

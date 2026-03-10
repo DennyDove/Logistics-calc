@@ -18,7 +18,7 @@ public class DtoController {
 
     private final UserSessionService userSessionService;
 
-    @PostMapping("/calc-dto")
+    @PostMapping("/api/calc-dto")
     public void saveOrderDto(HttpServletRequest request, @RequestBody TaskDto taskDto) {
         // Достаём guest_id из cookie
         String guestId = userSessionService.getGuestIdFromCookie(request);

@@ -3,7 +3,8 @@
 <head>
     <meta http-equiv="content-type" content="text/html" charset="UTF-8">
     <title>Main page</title>
-    <link href="styles/style.css" th:href="@{styles/style.css}" rel="stylesheet" type="text/css"/>
+<!--        Здесь обязателно ставить "/" - т.н. абсолютный путь. Иначе при запросе с /auth/login-1 будет прибавляться автоматически "/auth"                  -->
+    <link href="styles/style.css" th:href="@{/styles/style.css}" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 <!-- <h1>Клуб нумизматов</h1> -->
@@ -12,7 +13,7 @@
   <div id="container">
 
       <div class="header">
-        <div class="block_logo"> <a href="/"> <img src="images/logo.jpg" width="433" height="123" border="0"> </a> </div>
+        <div class="block_logo"> <a href="/"> <img src="/images/logo.jpg" width="433" height="123" border="0"> </a> </div>
         <div class="block_holder1">
           <div class="profile"> <img src="images/profile1.png" width="33" height="33" border="0"> <div class="auth_user"> [[${userInit}]] </div> </div>
           <div class="cart"> <a href="/cart"> <img th:if="${coinsInCart == 0}" src="images/shopping_cart.png" width="53" height="53" border="0">

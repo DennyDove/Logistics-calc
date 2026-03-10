@@ -7,6 +7,7 @@ import com.denidove.Logistics.repositories.UserRepository;
 import com.denidove.Logistics.services.UserRedisService;
 import com.denidove.Logistics.services.UserSessionService;
 import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
 import net.bytebuddy.utility.RandomString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +24,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+@Component
+@RequiredArgsConstructor
 public class CustomAuthenticationProvider implements AuthenticationProvider {
 
     private final UserRepository userRepository;
@@ -34,14 +37,6 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
     @Autowired
     private SimpleMailService simpleMailService;
 
-    public CustomAuthenticationProvider(UserRepository userRepository,
-                                        UserRedisService userRedisService,
-                                        PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.userRedisService = userRedisService;
-        this.passwordEncoder = passwordEncoder;
-    }
-
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 
@@ -49,6 +44,11 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         String password = (String) authentication.getCredentials();
 
         Optional<User> userOptional = userRepository.findUserByLogin(username);
+
+        if (userOptional.isEmpty()) {
+            userOptional = userRepository.findUserByPhone(username);
+        }
+
         if (userOptional.isEmpty()) {
             throw new UsernameNotFoundException("Пользователь не найден");
         }

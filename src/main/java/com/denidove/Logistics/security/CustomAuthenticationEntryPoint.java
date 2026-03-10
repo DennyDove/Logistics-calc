@@ -36,16 +36,19 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 
         // 🔹 2. API или AJAX — возвращаем JSON с 401
         if ((accept != null && accept.contains("application/json"))
-                || "XMLHttpRequest".equalsIgnoreCase(xRequestedWith)
-                || uri.startsWith("/api/")) {
+               || "XMLHttpRequest".equalsIgnoreCase(xRequestedWith)
+               || uri.startsWith("/api/")) {
 
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json");
             response.getWriter().write("{\"error\":\"Unauthorized or expired token\"}");
-            return;
         }
 
+        /** Третий пункт закомментили, т.к. Backend не должен сам редиректить, это должен делать клиент.
+         * То есть jwt-цепочка не должна ничего знать о браузере и UI/UX, данная цепочка должна только выдавать ответы клиенту по json
+
         // 🔹 3. HTML-запросы — редирект на страницу входа
-        response.sendRedirect("/login-1");
+        response.sendRedirect("/login-main");
+        */
     }
 }

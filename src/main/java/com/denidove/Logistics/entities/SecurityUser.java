@@ -25,7 +25,8 @@ public class SecurityUser implements UserDetails {
 
     @Override
     public String getUsername() {
-        return user.getName();
+        //В качестве Username используется либо логин либо пароль
+        return user.getLogin() != null ? user.getLogin() : user.getPhone();
     }
 
     @Override

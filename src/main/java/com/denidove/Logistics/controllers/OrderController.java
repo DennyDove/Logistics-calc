@@ -12,7 +12,12 @@ import com.denidove.Logistics.services.UserSessionService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -38,9 +43,18 @@ public class OrderController {
         this.jwtService = jwtService;
     }
 
-    @PostMapping("/order")
-    public ResponseEntity<TaskDto> saveOrder(@RequestParam(value = "key", required = true) String key,
+    @PostMapping("/api/order")
+    public ResponseEntity<?> saveOrder(@RequestParam(value = "key", required = true) String key,
                                              HttpServletRequest request) {
+
+        //toDo закомментили, т.к. ChatGPT рекомендовал: пусть Spring Security сам возвращает 401, а контроллер этим вообще не занимается.
+        /*
+        if(!isAuthenticated()) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .build();
+        }*/
+
         Task task = new Task();
         User user = userSessionService.getSecurityUser().getUser();
 
@@ -82,5 +96,13 @@ public class OrderController {
         }
 
         return ResponseEntity.ok().body(taskDto);
+    }
+
+    // Важно!
+    private boolean isAuthenticated() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return auth != null
+                && auth.isAuthenticated()
+                && !(auth instanceof AnonymousAuthenticationToken);
     }
 }

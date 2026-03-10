@@ -3,10 +3,8 @@
 <head>
     <meta http-equiv="content-type" content="text/html" charset="UTF-8">
     <title>Main page</title>
-    <link href="styles/style.css" th:href="@{styles/style.css}" rel="stylesheet" type="text/css"/>
-    <!-- В шаблонизаторе Thymeleaf джава скрипт подключается особым образом. См. ниже -->
-    <script th:src="@{/js/script.js}"></script>
-
+    <!--        Здесь обязателно ставить "/" - т.н. абсолютный путь. Иначе при запросе с /auth/login-1 будет прибавляться автоматически "/auth"                  -->
+    <link href="styles/style.css" th:href="@{/styles/style.css}" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 <!-- <h1>Клуб нумизматов</h1> -->
@@ -15,7 +13,7 @@
   <div id="container">
 
       <div class="header">
-        <div class="block_logo"> <a href="/"> <img src="images/logo.jpg" width="433" height="123" border="0"> </a> </div>
+        <div class="block_logo"> <a href="/"> <img src="/images/logo.jpg" width="433" height="123" border="0"> </a> </div>
         <div class="block_holder1"></div>
       </div>
       <div class="line1"></div>
@@ -34,7 +32,7 @@
 
         		<div th:if="${param.logout}">
         			Вы вышли из профиля.</div>
-            <form th:action="@{/login}" method="post" th:object="${user}">
+            <form th:action="@{/auth/login}" method="post" th:object="${user}">
               <h1> Вход в систему </h1>
               <p><input type="text" placeholder="Ваш логин" id="login" th:field="*{username}"></p>
               <p><input type="password" placeholder="Ваш Пароль" id="password" th:field="*{password}"></p>
@@ -59,6 +57,9 @@
       </div>
 
   </div>
+
+<!-- В шаблонизаторе Thymeleaf джава скрипт подключается особым образом. См. ниже -->
+<script th:src="@{/js/script.js}"></script>
 
 </body>
 </html>

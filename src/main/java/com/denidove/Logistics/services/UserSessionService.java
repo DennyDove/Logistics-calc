@@ -59,9 +59,10 @@ public class UserSessionService {
     public boolean getAuthStatus() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
+        /* Это нужно было для отладки
         Boolean check1 = authentication != null;
         Boolean check2 = authentication.isAuthenticated();
-        Boolean check3 = (authentication instanceof AnonymousAuthenticationToken);
+        Boolean check3 = (authentication instanceof AnonymousAuthenticationToken);*/
 
         return authentication != null
                 && authentication.isAuthenticated()

@@ -10,7 +10,7 @@ spring:
 
   datasource:
     driver-class-name: org.postgresql.Driver    # ?sslmode=require - нужно чтобы с БД по умолчанию использовалось SSL соединение
-    url: jdbc:postgresql://localhost:5432/logistics7 #?sslmode=require
+    url: jdbc:postgresql://localhost:5432/logistics8 #?sslmode=require
     username: postgres
     password: root
 
@@ -38,7 +38,7 @@ spring:
 
   jwt:
     secret: my-super-secret-and-long-key-1234567890
-    expiration: 3600000 # 1 час в миллисекундах     #23000
+    expiration: 23000 #3600000 # 1 час в миллисекундах     #23000
 
   data:
     redis:
@@ -50,6 +50,22 @@ spring:
 
   #thymeleaf:
   #  prefix-classpath: /static/
+
+sms:
+  provider: smsru   # p1 | smsru
+
+  smsru:
+    base-url: https://sms.ru
+    api-id: 433CC1CC-B7E3-D21D-C14A-B06B160D9941
+    timeout-ms: 5000
+    from: MYAPP   # опционально, если есть альфа-имя
+
+  p1:
+    base-url: https://admin.p1sms.ru
+    api-key: N66dyGZtL21YIBPmvM1mOPKhYuXrrQyRLNU7xhTSRaaV0miV9It3PdI7lvXf #${P1SMS_API_KEY:YOUR_API_KEY_HERE}
+    default-sender: "MYAPP"    # при необходимости
+    timeout-ms: 5000
+
 
 # отдельная настройка для использования сертификата https
 server:

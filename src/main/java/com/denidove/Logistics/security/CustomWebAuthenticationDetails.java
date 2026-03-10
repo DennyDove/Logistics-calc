@@ -1,3 +1,8 @@
+/**
+ * В новой архитектуре данный класс не применяется
+ */
+
+/*
 package com.denidove.Logistics.security;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,3 +21,4 @@ public class CustomWebAuthenticationDetails extends WebAuthenticationDetails {
         return verificationCode;
     }
 }
+*/

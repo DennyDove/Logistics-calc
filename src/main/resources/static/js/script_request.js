@@ -36,7 +36,7 @@ async function calcDto() {
     weight : weight.value
   };
 
-  let response = await fetch("/calc-dto",
+  let response = await fetch("/api/calc-dto",
     {
       method: 'POST',
       headers: {"Content-Type" : "application/json"},
@@ -88,7 +88,7 @@ async function vozCalc() {
           });
   */
 
-  let response = await fetch("/vozcalc",
+  let response = await fetch("/api/vozcalc",
     {
       method: 'POST',
       headers: {"Content-Type" : "application/json"},
@@ -130,7 +130,7 @@ async function dellineCalc() {
     weight : weight.value
   };
 
-  let response = await fetch("/delline",
+  let response = await fetch("/api/delline",
     {
       method: 'POST',
       headers: {"Content-Type" : "application/json"},
@@ -171,7 +171,7 @@ async function nordwCalc() {
     weight : weight.value
   };
 
-  let response = await fetch("/nordwcalc",
+  let response = await fetch("/api/nordwcalc",
     {
       method: 'POST',
       headers: {"Content-Type" : "application/json"},

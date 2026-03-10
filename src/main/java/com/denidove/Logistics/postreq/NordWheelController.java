@@ -1,20 +1,15 @@
 package com.denidove.Logistics.postreq;
 
 import com.denidove.Logistics.dto.TaskDto;
-import com.denidove.Logistics.exceptions.BadRequestException;
-import com.denidove.Logistics.exceptions.CalcRequestException;
-import com.denidove.Logistics.exceptions.IncorrectDimensionException;
-import com.denidove.Logistics.json.NordWheel;
-import com.denidove.Logistics.json.NordWheelCities;
+import com.denidove.Logistics.exceptions_old.CalcRequestException;
+import com.denidove.Logistics.exceptions_old.IncorrectDimensionException;
 import com.denidove.Logistics.services.TaskService;
 import com.denidove.Logistics.services.UserSessionService;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.HttpStatusCodeException;
 
 @RestController
 public class NordWheelController {
@@ -31,7 +26,7 @@ public class NordWheelController {
 
     }
 
-    @PostMapping("/nordwcalc")
+    @PostMapping("/api/nordwcalc")
     public ResponseEntity<TaskDto> nordWheelCalc(@RequestBody TaskDto taskDto) {
         //List<City> cities = List.of(City.Moscow, City.Piter, City.Saratov, City.Sochi);
 

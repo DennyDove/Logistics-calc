@@ -2,150 +2,186 @@ package com.denidove.Logistics.postreq.impl;
 
 import com.denidove.Logistics.dto.TaskDto;
 import com.denidove.Logistics.entities.SecurityUser;
-import com.denidove.Logistics.exceptions.RestTemplateResponseErrorHandler;
+import com.denidove.Logistics.exceptions.*;
+
 import com.denidove.Logistics.json.DelLine;
+import com.denidove.Logistics.json.DellineErr;
 import com.denidove.Logistics.postreq.DellineService;
-import com.denidove.Logistics.services.TaskService;
 import com.denidove.Logistics.services.UserSessionService;
 import com.denidove.Logistics.utils.CalendarUtils;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
-import org.springframework.web.client.HttpStatusCodeException;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.stereotype.Service;
 
-import java.util.LinkedHashMap;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
+
+import java.util.Map;
+
+/**
+ * В данном сервисе выстроена новая архитектура отправки запроса на основе WebClient
+ * В аналогичном классе VozServiceImpl применяется ещё старая архитектура на основе RestPemplate.
+ * Два варианта оставлены для сравнения
+*/
 
 
-@Component
+@Service
 public class DellineServiceImpl implements DellineService {
 
-    private static final Logger log = LoggerFactory.getLogger(DellineServiceImpl.class);
-    private final RestTemplate rest;
-    private final ObjectMapper mapper;
-    private final TaskService taskService;
+    private final WebClient dellineWebClient;
     private final UserSessionService userSessionService;
 
+    private final static Logger log = LoggerFactory.getLogger(DellineServiceImpl.class);
 
-    //@Value("${name.service.url}")
-    private String logisticServiceUrl;
+    // endpoint; можно вынести в @Value
+    private final String logisticServiceUrl = "https://api.dellin.ru/v2/calculator";
+    private final String appKey = "DADF6BBF-7EE8-40A0-9118-C169FBD949C4";
 
-    public DellineServiceImpl(RestTemplateBuilder restTemplateBuilder, ObjectMapper mapper, TaskService taskService,
-                              UserSessionService userSessionService) {
-        this.rest = restTemplateBuilder
-                .errorHandler(new RestTemplateResponseErrorHandler()) // добавили кастомный RestTemplateResponseErrorHandler
-                .build();
-        this.mapper = mapper;
-        this.taskService = taskService;
+    public DellineServiceImpl(WebClient dellineWebClient, UserSessionService userSessionService) {
+        this.dellineWebClient = dellineWebClient;
         this.userSessionService = userSessionService;
-
     }
 
-    // Отправка POST-запроса на сервис Delline
     @Override
-    public TaskDto sendRequest(HttpServletRequest servletRequest, TaskDto taskDto) throws JsonProcessingException, HttpStatusCodeException {
-        logisticServiceUrl = "https://api.dellin.ru/v2/calculator";
-        String url = logisticServiceUrl; //+ "?token=G934UM29wXG2IKYS9iX9oKQCeojkApHSEWAxOC5v";
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
+    public TaskDto sendRequest(HttpServletRequest request, TaskDto taskDto) {
+        validateDimensions(taskDto);
+        DelLine requestBody = buildRequestBody(taskDto);
 
-        String appkey = "DADF6BBF-7EE8-40A0-9118-C169FBD949C4"; // токен доступа к API
-        // Создаем объект Delline по заданным параметрам:
-        var logistics = objectToJson(appkey, taskDto);
-        // Трансформируем объект в json строку:
-        mapper.writeValueAsString(logistics);
+        try {
+            // === ВЫПОЛНЯЕМ ВНЕШНИЙ ЗАПРОС ===
+            Map<String, Object> responseBody =
+                    dellineWebClient.post()
+                            .uri(logisticServiceUrl)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .bodyValue(requestBody)
+                            .retrieve()
+                            .onStatus(HttpStatusCode::is4xxClientError, resp ->
+                                    resp.bodyToMono(String.class)
+                                            .map(this::extractDellineErrorDetail) // извлекаем/парсим ответ об ошибке
+                                            .map(DellineBadRequestException::new)
+                            )
+                            .onStatus(HttpStatusCode::is5xxServerError, resp ->
+                                    resp.bodyToMono(String.class)
+                                            .map(body -> new ExternalServiceException("Сервер Delline недоступен"))
+                            )
+                            .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
+                            .block(); // это означает, что наше приложение не-реактивное
 
-        HttpEntity<DelLine> request = new HttpEntity<>(logistics, headers);
-        ResponseEntity<LinkedHashMap<String, Object>> response = rest.exchange(url, HttpMethod.POST, request, new ParameterizedTypeReference<>() {});
-        var deliveryDetails = response.getBody();
-            taskDto.setPrice(0.0); // обнуление для корректности нового запроса
-            taskDto.setDays(0); // обнуление для корректности нового запроса
-        if(deliveryDetails.get("data") != null) {
-            var result = (LinkedHashMap<String, Double>) deliveryDetails.get("data"); //toDo прописать пояснения этой конструкции
-            var resultDates = (LinkedHashMap<String, LinkedHashMap>) deliveryDetails.get("data"); //toDo прописать пояснения этой конструкции
-            var orderDates = resultDates.get("orderDates");
-            var startDate = orderDates.get("derivalFromOspSender").toString();
-            var deliveryDate = orderDates.get("derivalFromOspReceiver").toString();
-            var days = CalendarUtils.getDays(startDate, deliveryDate); // определяем срок доставки
-            var price = result.get("price");
-            taskDto.setCompanyName("Деловые линии");
-            taskDto.setCompanyLogo("delline.jpg"); // в jar-архиве расширение файла JPG - чувствительно к регистру! При написании jpg - будет выдавать ошибку
-            taskDto.setPrice(price);
-            taskDto.setDays(days);
-
-            // Просто сохраняем состояние запроса пользователя
-            boolean loginStatus = userSessionService.getAuthStatus();
-            if(!loginStatus) {
-                String guestId = userSessionService.getGuestIdFromCookie(servletRequest);
-                userSessionService.saveTaskDto(guestId, "delline", taskDto);
-            } else {
-                var auth = SecurityContextHolder.getContext().getAuthentication();
-                var securityUser = (SecurityUser) auth.getPrincipal();
-                var login = securityUser.getLogin();
-                userSessionService.saveTaskDto(login, "delline",taskDto);
+            if (responseBody == null || responseBody.get("data") == null) {
+                throw new DellineBadRequestException("Пустой ответ от Delline");
             }
+
+            // Парсим данные
+            parseAndFillTaskDto(responseBody, taskDto);
+            saveTaskDtoForUser(request, taskDto);
+
+            return taskDto;
+
+        } catch (AppException ae) {
+            throw ae; // наши исключения — сразу наверх
+
+        } catch (WebClientRequestException wce) {
+            log.error("Network error calling Delline API", wce);
+            throw new ExternalServiceException("Сетевая ошибка при запросе в Delline");
+
         }
-        return taskDto;
     }
 
-    // Метод создает объект Delline для последующей трансформации этого объекта в json для post-запроса к сервису "Деловых Линий"
-    private DelLine objectToJson(String appkey, TaskDto taskDto) {
+    //toDo попробовать оптимизировать
+    private DelLine buildRequestBody(TaskDto taskDto) {
         String startPoint = taskDto.getStartPoint();
         String finishPoint = taskDto.getDestination();
-        Double width = taskDto.getWidth();
-        Double length = taskDto.getLength();
-        Double height = taskDto.getHeight();
-        String volume = String.valueOf(width * length * height);
-        String totalWeight = String.valueOf(taskDto.getWeight());
-        String oversizedVolume = volume;
-        String oversizedWeight = totalWeight;
+        float width = taskDto.getWidth().floatValue();
+        float length = taskDto.getLength().floatValue();
+        float height = taskDto.getHeight().floatValue();
+        float volume = width * length * height;
+        float weight = taskDto.getWeight().floatValue();
 
-        // сериализация: формирование json-строки на основе объекта Delline
-        var deliveryType = new DelLine.Delivery.DeliveryType("auto");
-        var address1 = new DelLine.Delivery.Address(startPoint);
-        //var address2 = new DelLine.Delivery.Address("47.204150, 39.701188");
-        var address2 = new DelLine.Delivery.Address(finishPoint);
-        var time = new DelLine.Delivery.Time("9:30", "19:00");
-        var derival = new DelLine.Delivery.Derival("address", CalendarUtils.getDerivalDate(), time, address1);
-        //var requirements = new String[]{"0x818e8ff1eda1abc349318a478659af08"};
-        var requirements = new String[]{};
-        var arrival = new DelLine.Delivery.Arrival("address", address2, time, requirements);
-        //var packages = new DelLine.Delivery.Packages[]{new DelLine.Delivery.Packages("0xA6A7BD2BF950E67F4B2CF7CC3A97C111", 1)};
-        //var delivery = new DelLine.Delivery(deliveryType, derival, arrival, packages);
-        var delivery = new DelLine.Delivery(deliveryType, derival, arrival);
-        var paymentCitySearch = new DelLine.Payment.PaymentCitySearch(finishPoint);
-        var payment = new DelLine.Payment(paymentCitySearch, "cash");
+        DelLine.Delivery.DeliveryType deliveryType = new DelLine.Delivery.DeliveryType("auto");
+        DelLine.Delivery.Address addrFrom = new DelLine.Delivery.Address(startPoint);
+        DelLine.Delivery.Address addrTo = new DelLine.Delivery.Address(finishPoint);
+        DelLine.Delivery.Time time = new DelLine.Delivery.Time("9:30", "19:00");
+        DelLine.Delivery.Derival derival = new DelLine.Delivery.Derival("address", CalendarUtils.getDerivalDate(), time, addrFrom);
+        DelLine.Delivery.Arrival arrival = new DelLine.Delivery.Arrival("address", addrTo, time, new String[]{});
+        DelLine.Delivery delivery = new DelLine.Delivery(deliveryType, derival, arrival);
 
-        var cargo = new DelLine.Cargo(1, length.floatValue(), width.floatValue(), height.floatValue(),
-                Float.parseFloat(volume), Float.parseFloat(totalWeight), Float.parseFloat(oversizedWeight), Float.parseFloat(oversizedVolume));
-        return new DelLine(appkey, delivery, payment, cargo);
+        DelLine.Payment.PaymentCitySearch pcs = new DelLine.Payment.PaymentCitySearch(finishPoint);
+        DelLine.Payment payment = new DelLine.Payment(pcs, "cash");
+
+        DelLine.Cargo cargo = new DelLine.Cargo(1,
+                length, width, height,
+                volume, weight, weight, volume);
+
+        return new DelLine(appKey, delivery, payment, cargo);
     }
 
-    // Получение абсолютного сетевого пути из текушей среды
-    @Override
-    public String getBaseUrl(HttpServletRequest request) {
-        // Get protocol, server name, port and context path
-        String scheme = request.getScheme(); // http
-        String serverName = request.getServerName(); // localhost
-        int serverPort = request.getServerPort(); // 8080
-        String contextPath = request.getContextPath(); // /myapp
-
-        StringBuilder baseUrl = new StringBuilder();
-        baseUrl.append(scheme).append("://").append(serverName);
-        if (serverPort != 80 && serverPort != 443) {
-            baseUrl.append(":").append(serverPort);
+    private void validateDimensions(TaskDto taskDto) {
+        if (taskDto.getLength() > 12.9 || taskDto.getWidth() > 2.4 || taskDto.getHeight() > 2.4) {
+            throw new IncorrectDimensionException("Весогабаритные характеристики груза превышают допустимые!");
         }
-        baseUrl.append(contextPath);
-        return baseUrl.toString();
     }
 
+    private void parseAndFillTaskDto(Map<String, Object> responseBody, TaskDto taskDto) {
+
+        Map<String, Object> data = (Map<String, Object>) responseBody.get("data");
+
+        Number priceNum = (Number) data.get("price");
+        double price = priceNum != null ? priceNum.doubleValue() : 0.0;
+
+        Map<String, Object> orderDates = (Map<String, Object>) data.get("orderDates");
+        String startDate = orderDates != null ? String.valueOf(orderDates.get("derivalFromOspSender")) : null;
+        String deliveryDate = orderDates != null ? String.valueOf(orderDates.get("derivalFromOspReceiver")) : null;
+
+        int days = 0;
+        if (startDate != null && deliveryDate != null) {
+            days = CalendarUtils.getDays(startDate, deliveryDate);
+        }
+        taskDto.setCompanyName("Деловые линии");
+        taskDto.setCompanyLogo("delline.jpg");
+        taskDto.setPrice(price);
+        taskDto.setDays(days);
+    }
+
+    private void saveTaskDtoForUser(HttpServletRequest servletRequest, TaskDto taskDto) {
+
+        boolean loginStatus = userSessionService.getAuthStatus();
+
+        if (!loginStatus) {
+            String guestId = userSessionService.getGuestIdFromCookie(servletRequest);
+            userSessionService.saveTaskDto(guestId, "delline", taskDto);
+        } else {
+            var auth = SecurityContextHolder.getContext().getAuthentication();
+            var securityUser = (SecurityUser) auth.getPrincipal();
+            var login = securityUser.getLogin();
+            userSessionService.saveTaskDto(login, "delline", taskDto);
+        }
+    }
+
+    // === метод извлечения ошибки Delline ===
+    private String extractDellineErrorDetail(String body) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.configure(DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY, true);
+
+            DellineErr err = mapper.readValue(body, DellineErr.class);
+
+            if (err.errors() != null && err.errors().length > 0 && err.errors()[0].detail() != null) {
+                return err.errors()[0].detail();
+            }
+
+            if (err.metadata() != null && err.metadata().detail() != null) {
+                return err.metadata().detail();
+            }
+
+        } catch (Exception e) {
+            log.warn("Failed to parse Delline error: {}", body);
+        }
+        return "Ошибка Delline API";
+    }
 }

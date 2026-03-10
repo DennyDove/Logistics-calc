@@ -32,7 +32,7 @@ public class TokenController {
 
         var login = userSessionService.getLoginByToken(tokenDto.getToken());
         if(login == null) {
-            return "redirect:/login-1?error=expired";
+            return "redirect:/auth/login-1?error=expired";
         }
 
         User user = userService.findByLogin(login)

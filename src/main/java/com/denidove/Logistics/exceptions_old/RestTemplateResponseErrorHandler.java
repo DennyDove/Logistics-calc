@@ -1,4 +1,4 @@
-package com.denidove.Logistics.exceptions;
+package com.denidove.Logistics.exceptions_old;
 
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;

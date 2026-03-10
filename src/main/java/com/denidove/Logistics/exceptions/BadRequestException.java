@@ -1,8 +1,7 @@
 package com.denidove.Logistics.exceptions;
 
-public class BadRequestException extends RuntimeException {
-
+public class BadRequestException extends AppException {
     public BadRequestException(String message) {
-        super(message);
+        super(400,"BAD_REQUEST", message);
     }
 }

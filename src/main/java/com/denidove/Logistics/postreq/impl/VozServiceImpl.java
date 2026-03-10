@@ -2,26 +2,32 @@ package com.denidove.Logistics.postreq.impl;
 
 import com.denidove.Logistics.dto.TaskDto;
 import com.denidove.Logistics.entities.SecurityUser;
-import com.denidove.Logistics.exceptions.CalcRequestException;
+import com.denidove.Logistics.exceptions_old.CalcRequestException;
 import com.denidove.Logistics.json.Vozovoz;
 import com.denidove.Logistics.postreq.VozService;
 import com.denidove.Logistics.services.TaskService;
 import com.denidove.Logistics.services.UserSessionService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.LinkedHashMap;
 
-@Component
+/**
+ * В данном сервисе применяется ещё старая архитектура на основе RestPemplate
+ * В аналогичном классе DellineServiceImpl уже выстроена новая архитектура
+ * отправки запроса на основе WebClient.
+ * Два варианта оставлены для сравнения
+ */
+
+@Service
 public class VozServiceImpl implements VozService {
 
     private static final Logger log = LoggerFactory.getLogger(VozServiceImpl.class);

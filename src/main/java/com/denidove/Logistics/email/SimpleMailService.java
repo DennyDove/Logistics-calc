@@ -110,7 +110,7 @@ public class SimpleMailService {
         var logoPath = "/static/images/logo.jpg";
 
         String siteUrl = userSessionService.getSiteUrl(user.getLogin());
-        String verifyUrl = siteUrl + "/verify?code=" + randomCode;
+        String verifyUrl = siteUrl + "/auth/verify?code=" + randomCode;
 
         //toDo дописать комментарий
         // Загружаем не файл, а ресурс методом getResourceAsStream() иначе в пакетном jar-файлк будет выдаваться ошибка ...
@@ -246,5 +246,38 @@ public class SimpleMailService {
                 .buildMailer();
         mailer.sendMail(email);
     }*/
+
+    public void sendPhoneEmail(String phone, String randomCode) throws Exception {
+
+        var logoPath = "/static/images/logo.jpg";
+
+        //toDo дописать комментарий
+        // Загружаем не файл, а ресурс методом getResourceAsStream() иначе в пакетном jar-файлк будет выдаваться ошибка ...
+        var htmlFile = NIO.readResource("/static/login_confirm.html");
+        // Вставляем в полученный текст переменные s%
+        var msgText = String.format(htmlFile, "Test", randomCode);
+        System.out.println(msgText);
+
+
+        Email email = EmailBuilder.startingBlank()
+                .from("dnis@mail.ru")
+                .to("dnis@mail.ru")
+                .withSubject("Одноразовый пароль для входа в сервис Skylar")
+                .withPlainText("Одноразовый пароль для входа в сервис Skylar")
+                .withHTMLText(msgText)
+                .withEmbeddedImage("logo", new ByteArrayDataSource(SimpleMailService.class.getResourceAsStream(logoPath), "image/jpeg"))
+                .buildEmail();
+
+        // Дополнительная конфигурация
+        Properties properties = new Properties();
+        properties.put("mail.smtp.auth" , "true");
+        properties.put("mail.smtp.ssl.enable" , "true");
+
+        Mailer mailer = MailerBuilder
+                .withSMTPServer("smtp.mail.ru", 465, "dnis@mail.ru", "IrOwOQnzyXlH4J0T3dNT")
+                .withProperties(properties)
+                .buildMailer();
+        mailer.sendMail(email);
+    }
 
 }

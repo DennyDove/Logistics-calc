@@ -1,7 +1,7 @@
 package com.denidove.Logistics.postreq.impl;
 
 import com.denidove.Logistics.dto.TaskDto;
-import com.denidove.Logistics.exceptions.BadRequestException;
+import com.denidove.Logistics.exceptions_old.BadRequestException;
 import com.denidove.Logistics.json.NordWheel;
 import com.denidove.Logistics.json.NordWheelCities;
 import com.denidove.Logistics.postreq.NordWheelService;
