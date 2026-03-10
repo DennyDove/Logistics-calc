@@ -1,138 +1,326 @@
 package com.denidove.Logistics.security;
 
-import com.denidove.Logistics.entities.User;
 import com.denidove.Logistics.repositories.UserRepository;
-import com.denidove.Logistics.services.UserService;
+import com.denidove.Logistics.security.jwt.JwtAuthenticationFilter;
+import com.denidove.Logistics.security.jwt.JwtService;
+import com.denidove.Logistics.security.phone.PhoneAuthenticationFilter;
+import com.denidove.Logistics.services.UserRedisService;
 import com.denidove.Logistics.services.UserSessionService;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AuthenticationDetailsSource;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.http.ResponseCookie;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.PortMapper;
+import org.springframework.security.web.PortMapperImpl;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
+import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.WebAuthenticationDetails;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AndRequestMatcher;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
+
+import java.util.Map;
 
 @Configuration
+@EnableWebSecurity
+@RequiredArgsConstructor // данная аннотация создает конструктор полей private final
 public class SecurityConfiguration {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final UserRedisService userRedisService;
+    private final GuestContextFilter guestContextFilter;
+    private final UserSessionService userSessionService;
+    private final JwtService jwtService;
+    //private final AuthenticationFailureHandler authFailureHandler; // обработка данной логики должна быть вынесена в фильтры, и не должна привязываться в SecurityConfig
+    private final CustomAuthenticationEntryPoint customEntryPoint;
+    private final FixedLoginRedirectEntryPoint fixedLoginRedirectEntryPoint;
 
-    @Autowired
-    private UserSessionService userSessionService;
+    private final PasswordEncoder passwordEncoder; // теперь приходит извне
+    private final JwtAuthenticationFilter jwtAuthFilter;
+    //private final SmsSendFilter smsSendFilter;
+    private final CustomAuthenticationProvider loginPasswordProvider;
+    /** Убираем это поле иначе появляется циклическая зависимость
+    private final PhoneAuthenticationFilter phoneAuthFilter;
+    */
+    private final PhoneAuthenticationFilter phoneAuthenticationFilter;
 
-    @Autowired
-    private CustomWebAuthenticationDetailsSource authenticationDetailsSource;
-
-    //@Autowired
-    //private AuthenticationFailureLogic authenticationFailureLogic;
-
-    //private final CustomAuthenticationProvider customAuthenticationProvider;
-
-    //public SecurityConfiguration(CustomAuthenticationProvider customAuthenticationProvider) {
-    //    this.customAuthenticationProvider = customAuthenticationProvider;
-    //}
-
+    /** Нельзя держать PasswordEncoder в SecurityConfiguration.
+     * Нужно вынести encoder в отдельный infrastructure-config и использовать его как обычный бин
     @Bean
     public PasswordEncoder passwordEncoder() {
-        //return NoOpPasswordEncoder.getInstance(); // вариант без шифровки пароля
         return new BCryptPasswordEncoder();
     }
-
-
-    @Bean
-    public AuthenticationFailureLogic getAuthFailureHandler(){
-        return new AuthenticationFailureLogic();
-    }
-
-    /*
-    @Bean
-    public UserDetailsService userDetailsService() {
-        return new CustomUserDetailsService();
-    }
     */
 
-    // toDo Один из вариантов подключения кастомного AuthenticationProvider.
-    // Мы его встраиваем в конфигурацию AuthenticationManager
-    /*
-    @Bean
-    public AuthenticationManager authManager(HttpSecurity http) throws Exception {
-        AuthenticationManagerBuilder authenticationManagerBuilder =
-                http.getSharedObject(AuthenticationManagerBuilder.class);
-        CustomAuthenticationProvider authProvider = new CustomAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService());
-        authenticationManagerBuilder.authenticationProvider(authProvider);
-        return authenticationManagerBuilder.build();
-    }
-    */
 
-    // Первый вариант подключения кастомного AuthenticationProvider
-    /*
+
+    /** Удаляем этот бин, т.к. образуется циклическая зависимость
+
+    //Обрабатывает как первый шаг (логин/пароль), так и второй (код).
+    // Здесь вручную добавляем бин, т.к. создаём CustomAuthenticationProvider с параметрами конструктора.
+    // Если просто добавить @Component на сам класс, Spring не сможет корректно его собрать автоматически и может получиться дублирующая регистрация.
     @Bean
-    public DaoAuthenticationProvider authProvider() {
-        CustomAuthenticationProvider authProvider = new CustomAuthenticationProvider();
-        //authProvider.setUserDetailsService(userDetailsService()); // Depricated
-        authProvider.setPasswordEncoder(passwordEncoder());
-        return authProvider;
+    public CustomAuthenticationProvider customAuthenticationProvider() {
+        return new CustomAuthenticationProvider(userRepository, userRedisService, passwordEncoder);
     }
     */
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        //http.httpBasic(Customizer.withDefaults());
-        http.csrf(AbstractHttpConfigurer::disable)
-                .cors(AbstractHttpConfigurer::disable);
-        //http.userDetailsService(userDetailsService()); // Не работает для установки кастомного userDetailsService
-        //http.authenticationProvider(authProvider()); // Spring автоматически подхватывает этот бин authProvider()
-        http.formLogin(
-                form -> form
-                        .authenticationDetailsSource(authenticationDetailsSource)
-                        .loginPage("/login-1")
-                        .loginProcessingUrl("/login")
-                        //.defaultSuccessUrl("/products", true)
-                        .failureHandler(getAuthFailureHandler())
-                        .successHandler((req, resp, auth) -> { // * действия в случае успешной авторизации
-                            //userSessionService.persistProductInCart(); // записываем добавленные товары неавторизованного пользователя
+    public PortMapper portMapper() {
+        PortMapperImpl mapper = new PortMapperImpl();
+        mapper.setPortMappings(Map.of("8080", "8444"));
+        return mapper;
+    }
 
-                            resp.setStatus(HttpStatus.OK.value());
-                            resp.sendRedirect("/"); // переход на главную страницу
-                        }).permitAll());
 
-        //toDo сделать нормальные инициалы в шаблоне orderok.html
+    private static final String[] PUBLIC_MATCHERS = {
+            "/", "/js/**", "/styles/**", "/images/**",
+            "/registration", "/auth/verify", "/verify2", "/confirm", "/login-main",
+            "/auth/login-1", "/auth/login-2", "/auth/request-sms", "/reset-page", "/reset"
+    };
 
-        http.authorizeHttpRequests(
-                requests -> {
-                    //              указываем паттерн "/**" т.к у нас в уже установлено "spring.thymeleaf.prefix=classpath:/static/"
-                    requests.requestMatchers("/js/**", "/styles/**", "/images/**", "/",
-                                    "/registration", "/adduser", "/verify", "/verify2", "/confirm", "/login-2", "/login", "/login-1**").permitAll();
-                    requests.requestMatchers(HttpMethod.POST,"/order-dto", "login").permitAll();
-                    requests.requestMatchers(HttpMethod.GET, "/admin-lk", "/active-orders").hasAuthority("Admin");
-                    requests.anyRequest().authenticated();
-                }
-        );
-        //http.addFilterAfter(new AuthenticationCodeFilter(), UsernamePasswordAuthenticationFilter.class);
+    private static final String[] PUBLIC_MATCHERS_POST = {
+            "/api/calc-dto", "/api/vozcalc", "/api/delline",
 
-        http.logout(e -> e.logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-                .logoutSuccessUrl("/").deleteCookies("JSESSIONID")
-                .invalidateHttpSession(true));
+            "/auth/login", "/api/auth/phone-send-code",
+            "/auth/phone-login",
+            "/auth/verify-code",
+            "/api/auth/adduser",
+            "/reset-mail", "/save-pass"
+    };
+
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring()
+                .requestMatchers("/js/**", "/styles/**", "/images/**", "/favicon.ico");
+    }
+
+    /**  Нужно создавать фильтр ручным вызовом new, а не через @Bean - иначе будет циклическая зависимость
+    @Bean
+    public PhoneAuthenticationFilter phoneAuthFilter(AuthenticationManager am) {
+        return new PhoneAuthenticationFilter(am);
+    }
+    */
+
+    // ============================================================
+    // AuthenticationManager Bean - этот создаёт цикл. Хотя это официальный "spring-way".
+    // ============================================================
+    /**
+    @Bean
+    public AuthenticationManager authenticationManager() throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    private AuthenticationManager authenticationManagerBean() throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
+    */
+
+
+    /**
+     * ✅ Основная конфигурация безопасности
+     */
+
+
+
+    // ============================================================
+    // 🟢 CHAIN 1 — PHONE/SMS LOGIN (PRIMARY LOGIN)
+    // ============================================================
+
+    @Bean
+    @Order(1)
+    public SecurityFilterChain phoneApiAuthChain(HttpSecurity http) throws Exception {
+
+        http
+                .securityMatcher("/api/auth/**")
+                .csrf(cs -> cs.disable())
+                .cors(c -> c.disable())
+                .sessionManagement(s ->
+                        s.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+                .requestCache(rc -> rc.disable())
+                //toDo разобраться!
+                /* Убираем этот блок, т.к. это уже прописано в PHONE FAILURE HANDLER
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((req, resp, e) -> {
+                            resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            /* Это выдается на фронте
+                            resp.setContentType("application/json");
+                            resp.getWriter().write("""
+                                { "error": "UNAUTHORIZED" }
+                            """);
+                        }
+                )*/
+                .addFilterBefore(phoneAuthenticationFilter, UsernamePasswordAuthenticationFilter.class
+                )
+                //toDo Разобраться что делает этот блок! - Разобрался. Комментарии см. ниже.
+                .authorizeHttpRequests(auth ->
+                        auth.anyRequest().permitAll()
+                );
 
         return http.build();
-
     }
+
+    /**
+     * auth.anyRequest().permitAll() -- Т.к. в первой цепочке безопасность обеспечивается:
+    - валидацией входных данных
+    - проверкой SMS/кода
+    - логикой AuthenticationProvider
+    - созданием Authentication после успешной проверки
+    А не через authorizeHttpRequests.
+
+    */
+
+    // ============================================================
+    // 🟡 CHAIN 2 — LOGIN/PASSWORD + 2FA (ALTERNATIVE LOGIN)
+    // ============================================================
+
+    @Bean
+    @Order(2)
+    public SecurityFilterChain loginPasswordChain(HttpSecurity http) throws Exception {
+
+        //toDo спросить у GPT правильное ли это рещение? Спросил - неправильное!
+        //AuthenticationManager authenticationManager = new ProviderManager(List.of(loginPasswordProvider));
+
+        http
+                .securityMatcher("/auth/login-1", "/auth/login", "/auth/login-2", "/auth/verify-code")
+                .csrf(cs -> cs.disable())
+                .cors(c -> c.disable())
+                .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                .authenticationProvider(loginPasswordProvider)
+                .formLogin(form -> form
+                        .loginPage("/auth/login-1")
+                        .loginProcessingUrl("/auth/login")
+                        .successHandler((req, resp, auth) -> {
+                            resp.sendRedirect("/auth/login-2");
+                        })
+                        //toDo сделать нормальный переход на нормальную страницу login-1
+                        .failureUrl("/auth/login-1?error")
+                )
+                .authorizeHttpRequests(auth -> auth
+                                .requestMatchers(PUBLIC_MATCHERS).permitAll()
+                                .requestMatchers(HttpMethod.POST, PUBLIC_MATCHERS_POST).permitAll()
+                        .anyRequest().permitAll());
+
+        return http.build();
+    }
+
+    // ============================================================
+    // 🟦 CHAIN 3 — JWT CHAIN (MAIN)
+    // ============================================================
+
+    @Bean
+    @Order(3)
+    public SecurityFilterChain jwtChain(HttpSecurity http) throws Exception {
+
+        http
+                .securityMatcher("/api/**")
+
+                /*.securityMatcher(new AndRequestMatcher(
+                        new AntPathRequestMatcher("/api/**"),
+                        new NegatedRequestMatcher(new AntPathRequestMatcher("/api/auth/**"))
+                ))*/
+
+
+                .csrf(cs -> cs.disable())
+                .cors(c -> c.disable())
+                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(customEntryPoint)
+                )
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.POST, PUBLIC_MATCHERS_POST).permitAll()
+                        // остальные требуют auth
+                        .anyRequest().authenticated()
+                )
+                .addFilterBefore(jwtAuthFilter, AnonymousAuthenticationFilter.class)
+                .addFilterAfter(guestContextFilter, JwtAuthenticationFilter.class);
+
+        return http.build();
+    }
+
+    // ============================================================
+    // 🔴 CHAIN 4 — UI-CHAIN REDIRECT TO LOGIN-MAIN
+    // ============================================================
+
+    // Есть ли целосообразность этой четвертой цепочки?
+
+    //toDo четко определить SecurityMatcher для 4-х цепочек!
+
+    @Bean
+    @Order(4)
+    SecurityFilterChain webChain(HttpSecurity http) throws Exception {
+        http
+                //toDo Разобраться пишем ли состояние SessionCreationPolicy -> IF_REQUIRED ?
+                //toDo И вообще у меня в Cookies - одновременно и JSESSIONID и jwt-токен. Так наверное не должно быть...
+
+        /** Не хочет заходить в /user-lk, опять выстреливает порт 8443:
+        2025-12-30T17:39:09.523+03:00 DEBUG 1624 --- [Logistics] [nio-8080-exec-1] o.s.security.web.FilterChainProxy        : Securing GET /user-lk
+        2025-12-30T17:39:09.526+03:00 DEBUG 1624 --- [Logistics] [nio-8080-exec-1] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+        2025-12-30T17:39:09.527+03:00 DEBUG 1624 --- [Logistics] [nio-8080-exec-1] o.s.s.w.s.HttpSessionRequestCache        : Saved request https://localhost:8443/user-lk?continue to session
+        2025-12-30T17:39:09.528+03:00 DEBUG 1624 --- [Logistics] [nio-8080-exec-1] o.s.s.web.DefaultRedirectStrategy        : Redirecting to https://localhost:8443/login-main
+
+        Разобрался! Чтобы устранить эту ошибку, нужно было добавить:
+         .addFilterBefore(jwtAuthFilter, AnonymousAuthenticationFilter.class)
+
+         Иначе данный запрос на /user-lk считался неаутентифицированным (т.к не попадал в jwt-цепочку)
+
+        */
+
+                .securityMatcher("/**") //   /login-main обрабатывается в этой цепочке
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(PUBLIC_MATCHERS).permitAll()
+                        .requestMatchers(HttpMethod.POST, PUBLIC_MATCHERS_POST).permitAll()
+                        .anyRequest().authenticated()
+                )
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(fixedLoginRedirectEntryPoint)
+                )
+
+                /** Вариант, при котором выскакивает порт 8443. Чтобы это исправить нужно жестко прописать порт 8080.
+                 *  см. код выше.
+                 *
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(
+                                new LoginUrlAuthenticationEntryPoint("/login-main")
+                        )
+                )*/
+                //toDo Разобраться с кодом ниже:
+                .addFilterBefore(jwtAuthFilter, AnonymousAuthenticationFilter.class)
+                .anonymous(Customizer.withDefaults())
+                .logout(logout -> logout
+                .logoutUrl("/logout") // эндпоинт выхода
+                .addLogoutHandler((request, response, authentication) -> {
+                    // Удаляем cookie с JWT
+                    ResponseCookie cookie = ResponseCookie.from("jwt", "")
+                            .httpOnly(true)
+                            .secure(true)
+                            .path("/")
+                            .maxAge(0)
+                            .sameSite("Strict")
+                            .build();
+                    response.addHeader("Set-Cookie", cookie.toString());
+                })
+                .logoutSuccessHandler((request, response, authentication) -> {
+                    response.sendRedirect("/login-main");
+                })
+                .permitAll()
+        );
+
+        return http.build();
+    }
+
 }

@@ -1,9 +1,7 @@
 package com.denidove.Logistics.exceptions;
 
-public class IncorrectDimensionException extends RuntimeException {
-    private static String price;
-
+public class IncorrectDimensionException extends AppException {
     public IncorrectDimensionException(String message) {
-        super(message);
+        super(400, "INCORRECT_DIMENSION", message);
     }
 }

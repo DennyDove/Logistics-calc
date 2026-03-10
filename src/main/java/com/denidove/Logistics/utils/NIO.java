@@ -2,8 +2,11 @@ package com.denidove.Logistics.utils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.stream.Collectors;
 
 public class NIO {
 
@@ -28,5 +31,18 @@ public class NIO {
             }
         } catch (IOException e) {}
         return stringBuilder.toString();
+    }
+
+    public static String readResource(String path) {
+        String htmlFile = "";
+
+        try (InputStream inputStream = NIO.class.getResourceAsStream(path);
+             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+             htmlFile = reader.lines().collect(Collectors.joining("\n"));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    return htmlFile;
     }
 }

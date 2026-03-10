@@ -9,8 +9,8 @@ spring:
       max-request-size: 1280KB
 
   datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/logistics7
+    driver-class-name: org.postgresql.Driver    # ?sslmode=require - нужно чтобы с БД по умолчанию использовалось SSL соединение
+    url: jdbc:postgresql://localhost:5432/logistics8 #?sslmode=require
     username: postgres
     password: root
 
@@ -36,12 +36,58 @@ spring:
       continue-on-error: false
       mode: never #always
 
+  jwt:
+    secret: my-super-secret-and-long-key-1234567890
+    expiration: 23000 #3600000 # 1 час в миллисекундах     #23000
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      # если Redis требует пароль, добавь:
+      # password: yourpassword
+      # для корректной работы Redis его нужно установать в другую папку (чтобы не было проблем с правами доступа)
+
   #thymeleaf:
   #  prefix-classpath: /static/
+
+sms:
+  provider: smsru   # p1 | smsru
+
+  smsru:
+    base-url: https://sms.ru
+    api-id: 433CC1CC-B7E3-D21D-C14A-B06B160D9941
+    timeout-ms: 5000
+    from: MYAPP   # опционально, если есть альфа-имя
+
+  p1:
+    base-url: https://admin.p1sms.ru
+    api-key: N66dyGZtL21YIBPmvM1mOPKhYuXrrQyRLNU7xhTSRaaV0miV9It3PdI7lvXf #${P1SMS_API_KEY:YOUR_API_KEY_HERE}
+    default-sender: "MYAPP"    # при необходимости
+    timeout-ms: 5000
+
+
+# отдельная настройка для использования сертификата https
+server:
+  port: 8080
+  ssl:
+    enabled: true
+    key-store: classpath:keystore.p12
+    key-store-password: 1234567
+    key-store-type: PKCS12
+    key-alias: mycert
 
 logging:
   level:
     root: info
+    org.simplejavamail: DEBUG
+    org.springframework.mail: DEBUG
+
+    #Временно, для отладки:
+    org.springframework.security: DEBUG
+    #org.springframework.security.web: TRACE
+    #org.apache.catalina.connector: DEBUG
+    #org.springframework.web: DEBUG
 
 ---
 

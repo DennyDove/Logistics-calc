@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="content-type" content="text/html" charset="UTF-8">
+    <title>Main page</title>
+    <link href="styles/style.css" th:href="@{styles/style.css}" rel="stylesheet" type="text/css"/>
+
+</head>
+<body>
+<!-- <h1>Клуб нумизматов</h1> -->
+<h3></h3>
+<!-- Основной контейнер, включающий остальные DIV-->
+  <div id="container">
+
+      <div class="header">
+        <div class="block_logo"> <a href="/"> <img src="images/logo.jpg" width="433" height="123" border="0"> </a> </div>
+        <div class="block_holder1"></div>
+      </div>
+      <div class="line1"></div>
+      <div id="content_container">
+
+        <br /><br />
+        <div id="login_holder">
+          <div class="regform">
+
+            <form th:action="@{/reset-mail}" method="post" th:object="${user}">
+              <h1> Восстановление пароля </h1>
+              <p><input type="text" placeholder="Ваш логин" id="login" th:field="*{username}"></p>
+              <p><input type="submit" value="Сбросить" /></p>
+            </form>
+              <!-- Более приемлемый вариант через redirectAttribute -->
+              <div th:if="${infoMessage}"> [[${infoMessage}]] </div>
+              <div th:if="${successMessage}"> [[${successMessage}]] </div>
+
+              <!-- Этот вариант через @RequestParam не используеся -->
+              <div th:if="${param.message != null and param.message.contains('success')}">
+                  <!--     здесь см. выше - нужно сделать проверку на != null иначае выскочит ошибка -->
+                  [[${msg}]] </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="footer">
+          <div class="rights_text_holder">
+              <p class="shrimping_height"> 2025 &#169; Все права защищены.</p>
+              <p class="shrimping_height">
+            <span id="trade_mark"><a href="/"> ИП Скляр Федор Васильевич
+                <!-- OOO &#171;Logistics Pro&#187; --> </a></span>.</p>
+              <p class="shrimping_height">Полное или частичное использование материалов данного сайта возможно только с письменного разрешения администрации сайта.</p>
+          </div>
+      </div>
+
+  </div>
+
+</body>
+</html>

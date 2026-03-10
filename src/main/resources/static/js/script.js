@@ -5,6 +5,7 @@
 let name = document.getElementById("name");
 let login = document.getElementById("login");
 let age = document.getElementById("age");
+let phone = document.getElementById("phone");
 let email = document.getElementById("email");
 let password = document.getElementById("password");
 let twoauth = document.getElementById("twoFAuth");
@@ -72,13 +73,14 @@ async function createUser() {
   let obj = {
     name : name.value,
     login : login.value,
+    phone : phone.value,
     email : email.value,
     age : age.value,
     password : password.value,
     twoauth : twoauth.checked
   };
 
-  let request = await fetch("/adduser",
+  let request = await fetch("/api/auth/adduser",
   // Если указать путь URI --> "https", то будет выскакивать ошибка Failed to load resource: net::ERR_SSL_PROTOCOL_ERROR
     {
       method: 'POST',
@@ -110,5 +112,6 @@ email.addEventListener("keyup", function() {
 });
 
 regButton.addEventListener("click", function() {
-    if(correctPassword === true && correctAge === true && correctEmail) createUser();
+    //if(correctPassword === true && correctAge === true && correctEmail) createUser();
+    createUser();
 });

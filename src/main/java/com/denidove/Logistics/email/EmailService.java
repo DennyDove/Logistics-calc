@@ -181,7 +181,7 @@ public class EmailService {
                 Message.RecipientType.TO, InternetAddress.parse(user.getEmail()));
         message.setSubject("Подтверждение регистрации на сайте Logistics.pro");
 
-        String siteUrl = userSessionService.getSiteUrl();
+        String siteUrl = userSessionService.getSiteUrl(user.getLogin());
         String verifyUrl = siteUrl + "/verify?code=" + code;
 
         String msgText = """

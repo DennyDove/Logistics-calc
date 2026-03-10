@@ -21,7 +21,36 @@ let calcDivHeight = 353;
 let calcButton = document.getElementById("calcButton");
 let orderButton1 = document.getElementById("orderButton1");
 let orderButton2 = document.getElementById("orderButton2");
-let orderButton3 = document.getElementById("orderButton3");*/
+let orderButton3 = document.getElementById("orderButton3"); */
+
+// Отправка первого post-запроса
+async function calcDto() {
+
+  let obj = {
+    cargoName : cargoName.value,
+    startPoint : startPoint.value,
+    destination : destination.value,
+    length : length.value,
+    width : width.value,
+    height : height.value,
+    weight : weight.value
+  };
+
+  let response = await fetch("/api/calc-dto",
+    {
+      method: 'POST',
+      headers: {"Content-Type" : "application/json"},
+      body: JSON.stringify(obj)
+    });
+
+  if(response.ok) {
+    // window.location.href = "/";
+  } else {
+    let errMsg = await response.text();
+    alert("HTTP error: "+ errMsg);
+  }
+}
+
 
 // Отправка post-запроса
 async function vozCalc() {
@@ -59,7 +88,7 @@ async function vozCalc() {
           });
   */
 
-  let response = await fetch("/vozcalc",
+  let response = await fetch("/api/vozcalc",
     {
       method: 'POST',
       headers: {"Content-Type" : "application/json"},
@@ -101,7 +130,7 @@ async function dellineCalc() {
     weight : weight.value
   };
 
-  let response = await fetch("/delline",
+  let response = await fetch("/api/delline",
     {
       method: 'POST',
       headers: {"Content-Type" : "application/json"},
@@ -142,7 +171,7 @@ async function nordwCalc() {
     weight : weight.value
   };
 
-  let response = await fetch("/nordwcalc",
+  let response = await fetch("/api/nordwcalc",
     {
       method: 'POST',
       headers: {"Content-Type" : "application/json"},
@@ -170,6 +199,8 @@ async function nordwCalc() {
 }
 
 calcButton.addEventListener("click", async function() {
+    await calcDto();
+
     calcDivHeight = 353;
     calcDiv.style.height = "350px";
     loading.className = "show";
@@ -183,6 +214,6 @@ calcButton.addEventListener("click", async function() {
     await vozCalc();
     loading.className = "show";
     await dellineCalc();
-    loading.className = "show";
-    await nordwCalc();
+    //loading.className = "show";  // выключен т.к. здесь загрузка завершена
+    // await nordwCalc();  // сервис нуждается в обновлении параметров интеграции по api
 });

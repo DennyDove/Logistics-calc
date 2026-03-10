@@ -5,6 +5,7 @@ import com.denidove.Logistics.services.UserService;
 import com.denidove.Logistics.services.UserSessionService;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,12 +40,15 @@ public class UserController {
     }
     */
 
-    @PostMapping("/adduser")
+    @PostMapping("/api/auth/adduser")
     public void processRegister(@RequestBody User user, HttpServletRequest request)
             throws UnsupportedEncodingException, MessagingException {
+
         //userService.save(user);
 
-        userSessionService.setSiteUrl(getSiteURL(request));
+        // Записываем пользователя в Redis для последующей активации (логика регистрации)
+        userSessionService.saveSiteUrl(user.getLogin(), getSiteURL(request));
+
         userService.register(user);
         //return "register_success";
     }
